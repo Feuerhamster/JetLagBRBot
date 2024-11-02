@@ -1,0 +1,6 @@
+@JetLagBRBot_HostAddress = http://localhost:5245
+
+GET {{JetLagBRBot_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
