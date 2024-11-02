@@ -2,7 +2,7 @@ using JetLagBRBot.Services;
 
 namespace JetLagBRBot.GameModes.BattleRoyale;
 
-public class BattleRoyaleGamemode : BaseGame
+public class BattleRoyaleGamemode
 {
     private readonly ITelegramBotService _telegramBot;
     

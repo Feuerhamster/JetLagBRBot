@@ -2,15 +2,15 @@ using JetLagBRBot.Models;
 using JetLagBRBot.Services;
 using Telegram.Bot.Types;
 
-namespace JetLagBRBot.GameModes;
+namespace JetLagBRBot.Game;
 
-public abstract class BaseGame<GameState, TeamState, PlayerState>
+public abstract class GameRoutine<GameState, TeamState, PlayerState>
 {
     protected Game<GameState, TeamState, PlayerState> State { get; private set; }
     private Dictionary<Guid, Location> PlayerLocations { get; set; }
     private readonly ITelegramBotService _telegramBot;
 
-    public BaseGame(ITelegramBotService tg)
+    public GameRoutine(ITelegramBotService tg)
     {
         this._telegramBot = tg;
     }

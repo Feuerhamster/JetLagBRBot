@@ -12,11 +12,15 @@ public interface ITelegramBotService
 public class TelegramBotService : ITelegramBotService
 {
     private readonly TelegramBotClient _client;
+    
+    private readonly ICommandService _commandService;
 
     public event EventHandler<Message> OnUserLocation; 
     
-    public TelegramBotService(IConfiguration config)
+    public TelegramBotService(IConfiguration config, ICommandService commandService)
     {
+        this._commandService = commandService;
+        
         string? token = config.GetValue<string>("TG_API_KEY");
 
         if (string.IsNullOrEmpty(token))
@@ -33,16 +37,29 @@ public class TelegramBotService : ITelegramBotService
         
         this._client.OnMessage += this.OnMessage;
         this._client.OnUpdate += this.OnUpdate;
+
+        this._client.DeleteMyCommandsAsync().Wait();
+        List<BotCommand> commands = this._commandService.GetBotCommands();
+        this._client.SetMyCommandsAsync(commands);
     }
     
-    private Task OnMessage(Message msg, UpdateType type)
+    private async Task OnMessage(Message msg, UpdateType type)
     {
+        // is a location update
         if (msg.Type == MessageType.Location)
         {
             this.OnUserLocation.Invoke(this, msg);
         }
-        
-        return Task.CompletedTask;
+        // Is a command
+        else if (msg.Type == MessageType.Text && msg.Text.StartsWith("/"))
+        {
+            bool commandExists = await this._commandService.HandleCommand(msg.Text.Substring(1), msg, type);
+
+            if (!commandExists)
+            {
+                await this._client.SendTextMessageAsync(msg.Chat.Id, "Command not found");
+            }
+        }
     }
 
     private Task OnUpdate(Update update)
