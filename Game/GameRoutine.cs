@@ -4,7 +4,7 @@ using Telegram.Bot.Types;
 
 namespace JetLagBRBot.Game;
 
-public abstract class GameRoutine<GameState, TeamState, PlayerState>
+public class GameRoutine<GameState, TeamState, PlayerState>
 {
     protected Game<GameState, TeamState, PlayerState> State { get; private set; }
     private Dictionary<Guid, Location> PlayerLocations { get; set; }

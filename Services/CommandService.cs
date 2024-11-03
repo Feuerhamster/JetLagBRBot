@@ -18,6 +18,11 @@ public interface ICommandService
     public Task<bool> HandleCommand(string command, Message msg, UpdateType type);
 }
 
+/**
+ * DI for non http request bound services (needed for commands)
+ * https://stackoverflow.com/questions/37189984/dependency-injection-with-classes-other-than-a-controller-class
+ */
+
 public class CommandService: ICommandService
 {
     private readonly Dictionary<string, ICommand> Commands = new();
