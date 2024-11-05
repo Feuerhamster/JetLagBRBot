@@ -11,6 +11,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ITelegramBotService, TelegramBotService>();
 builder.Services.AddSingleton<ICommandService, CommandService>();
+builder.Services.AddSingleton<IGameLogService, GameLogService>();
 
 var app = builder.Build();
 

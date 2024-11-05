@@ -1,20 +1,16 @@
-using Telegram.Bot.Requests;
+using System.Windows.Input;
+using JetLagBRBot.Models;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace JetLagBRBot.Services;
 
-public interface ICommand
-{
-    public string Command { get; }
-    public string Description { get; }
-    public Task Execute(Message msg, UpdateType type);
-}
+
 
 public interface ICommandService
 {
     public List<BotCommand> GetBotCommands();
-    public void AddCommand(ICommand command);
+    public void AddCommand(IBotCommand command);
     public Task<bool> HandleCommand(string command, Message msg, UpdateType type);
 }
 
@@ -25,7 +21,7 @@ public interface ICommandService
 
 public class CommandService: ICommandService
 {
-    private readonly Dictionary<string, ICommand> Commands = new();
+    private readonly Dictionary<string, IBotCommand> Commands = new();
 
     public List<BotCommand> GetBotCommands()
     {
@@ -43,7 +39,7 @@ public class CommandService: ICommandService
         return botCommands;
     }
 
-    public void AddCommand(ICommand cmd)
+    public void AddCommand(IBotCommand cmd)
     {
         this.Commands.Add(cmd.Command, cmd);
     }
