@@ -10,13 +10,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ITelegramBotService, TelegramBotService>();
-builder.Services.AddSingleton<ICommandService, CommandService>();
+builder.Services.AddSingleton<IGameTemplateService, GameTemplateService>();
 builder.Services.AddSingleton<IGameLogService, GameLogService>();
 
 var app = builder.Build();
 
 // init telegram bot
 app.Services.GetService<ITelegramBotService>();
+
+IGameTemplateService gameTemplateService = app.Services.GetService<IGameTemplateService>();
+
+var templateLog = gameTemplateService.ReloadTemplates();
+
+Console.WriteLine(String.Join("\n", templateLog.ToArray()));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

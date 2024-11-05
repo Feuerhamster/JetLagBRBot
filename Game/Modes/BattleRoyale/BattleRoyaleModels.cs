@@ -31,8 +31,13 @@ public class PlayerOrTeamStateData
 public class Landmark(double latitude, double longitude, string name, string district)
 {
     public Guid Id { get; set; } = new Guid();
-    public double Latitude { get; set; } = latitude;
-    public double Longitude { get; set; } = longitude;
+    public double[] Coordinates { get; set; } = [latitude, longitude];
     public string Name { get; set; } = name;
     public string District { get; set; } = district;
+}
+
+public class BattleRoyaleGameData
+{
+    public int TimeBetweenDrops { get; set; }
+    public List<Landmark> Landmarks { get; set; }
 }

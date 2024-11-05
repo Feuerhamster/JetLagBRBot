@@ -1,3 +1,5 @@
+using System.Windows.Input;
+using JetLagBRBot.Models;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -13,14 +15,16 @@ public class TelegramBotService : ITelegramBotService
 {
     private readonly TelegramBotClient _client;
     
-    private readonly ICommandService _commandService;
+    private readonly List<BotCommand> Commands = new();
 
     public event EventHandler<Message> OnUserLocation; 
     
-    public TelegramBotService(IConfiguration config, ICommandService commandService)
+    public event EventHandler<KeyValuePair<Message, BotCommand>> OnCommand;
+
+    public event EventHandler<KeyValuePair<Message, Document>> OnDocument;
+    
+    public TelegramBotService(IConfiguration config)
     {
-        this._commandService = commandService;
-        
         string? token = config.GetValue<string>("TG_API_KEY");
 
         if (string.IsNullOrEmpty(token))
@@ -37,10 +41,6 @@ public class TelegramBotService : ITelegramBotService
         
         this._client.OnMessage += this.OnMessage;
         this._client.OnUpdate += this.OnUpdate;
-
-        this._client.DeleteMyCommandsAsync().Wait();
-        List<BotCommand> commands = this._commandService.GetBotCommands();
-        this._client.SetMyCommandsAsync(commands);
     }
     
     private async Task OnMessage(Message msg, UpdateType type)
@@ -53,17 +53,49 @@ public class TelegramBotService : ITelegramBotService
         // Is a command
         else if (msg.Type == MessageType.Text && msg.Text.StartsWith("/"))
         {
-            bool commandExists = await this._commandService.HandleCommand(msg.Text.Substring(1), msg, type);
+            string rawCmd = msg.Text.Substring(1);
 
-            if (!commandExists)
+            var cmd = this.Commands.Find(x => x.Command == rawCmd);
+            
+            if (cmd == null)
             {
                 await this._client.SendTextMessageAsync(msg.Chat.Id, "Command not found");
             }
+            
+            this.OnCommand.Invoke(this, new KeyValuePair<Message, BotCommand>(msg, cmd));
         }
     }
 
     private Task OnUpdate(Update update)
     {
         return Task.CompletedTask;
+    }
+
+    private void UpdateCommands()
+    {
+        this._client.DeleteMyCommands();
+        this._client.SetMyCommands(this.Commands);
+    }
+    
+    /// <summary>
+    /// Add a single command to the already existing command list
+    /// </summary>
+    /// <param name="cmd">command</param>
+    public void AddCommand(BotCommand cmd)
+    {
+        this.Commands.Add(cmd);
+    }
+
+    /// <summary>
+    /// Clears the current command list and add new ones
+    /// </summary>
+    /// <param name="commands">List of new commands</param>
+    public void SetCommands(List<BotCommand> commands)
+    {
+        this.Commands.Clear();
+        foreach (var cmd in commands)
+        {
+            this.Commands.Add(cmd);
+        }
     }
 }
