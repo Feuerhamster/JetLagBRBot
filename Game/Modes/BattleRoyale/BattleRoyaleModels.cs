@@ -10,7 +10,8 @@ public enum EPowerUpType
 {
     SelfStatus,
     Instant,
-    TargetStatus
+    TargetStatus,
+    GlobalStatus
 }
 
 public interface IPowerUp

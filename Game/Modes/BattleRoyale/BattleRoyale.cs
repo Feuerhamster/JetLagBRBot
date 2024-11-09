@@ -1,4 +1,5 @@
 using JetLagBRBot.Game;
+using JetLagBRBot.Models;
 using JetLagBRBot.Services;
 
 namespace JetLagBRBot.GameModes.BattleRoyale;
@@ -6,11 +7,8 @@ namespace JetLagBRBot.GameModes.BattleRoyale;
 
 public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateData, PlayerOrTeamStateData>
 {
-    private readonly ITelegramBotService _telegramBot;
-    private readonly BattleRoyaleGameData _gameData;
-    
-    public BattleRoyaleGamemode(ITelegramBotService tg, IGameTemplateService ts, IServiceProvider services) : base(services)
+    public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, IServiceProvider services) : base(template, services)
     {
-        this._telegramBot = tg;
+
     }
 }

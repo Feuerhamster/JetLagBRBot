@@ -6,6 +6,9 @@ namespace JetLagBRBot.Services;
 public interface IGameTemplateService
 {
     public List<string> ReloadTemplates();
+    public List<KeyValuePair<Guid, string>> GetTemplateList();
+    public GameTemplate GetGameTemplate(Guid templateId);
+    public D LoadGameData<D>(Guid templateId);
 }
 
 public class GameTemplateService : IGameTemplateService
@@ -14,16 +17,15 @@ public class GameTemplateService : IGameTemplateService
     private const string GAMEDATA_FILE = "gamedata.json";
         
     private List<GameTemplate> GameTemplates { get; set; } = new();
-    
-    public GameTemplateService()
-    {
-    }
 
     public List<string>  ReloadTemplates()
     {
         List<string> log = new();
         
         var directories = Directory.GetDirectories($"{AppContext.BaseDirectory}/Game/Templates");
+        
+        this.GameTemplates.Clear();
+        
         foreach (var dir in directories)
         {
             string configPath = Path.Combine(dir, CONFIG_FILE);
@@ -61,21 +63,38 @@ public class GameTemplateService : IGameTemplateService
                 continue;
             }
 
-            var t = new GameTemplate(config.GameMode, config.Name, dir);
+            var t = new GameTemplate(config, dir);
             
             this.GameTemplates.Add(t);
 
-            log.Add($"Successfully loaded game template: {t.Name}");
+            log.Add($"Successfully loaded game template: {config.Name}");
         }
 
         return log;
     }
 
-    public D? LoadGameData<D>(string gameModeName)
+    public List<KeyValuePair<Guid, string>> GetTemplateList()
     {
-        GameTemplate gameTemplate = this.GameTemplates.FirstOrDefault(x => x.Name == gameModeName);
+        List<KeyValuePair<Guid, string>> templateList = new();
 
-        if (gameTemplate == null) throw new Exception("Game data not found for " + gameModeName);
+        foreach (var template in this.GameTemplates)
+        {
+            templateList.Add(new KeyValuePair<Guid, string>(template.id, template.Config.Name));
+        }
+
+        return templateList;
+    }
+
+    public GameTemplate GetGameTemplate(Guid templateId)
+    {
+        return this.GameTemplates.FirstOrDefault(x => x.id == templateId);
+    }
+    
+    public D LoadGameData<D>(Guid templateId)
+    {
+        GameTemplate gameTemplate = this.GameTemplates.FirstOrDefault(x => x.id == templateId);
+
+        if (gameTemplate == null) throw new Exception("Game data not found for " + templateId);
 
         string rawConfig = File.ReadAllText(Path.Combine(gameTemplate.FilePath, GAMEDATA_FILE));
             

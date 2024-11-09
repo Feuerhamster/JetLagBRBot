@@ -1,4 +1,5 @@
 using LiteDB;
+using Telegram.Bot.Types;
 
 namespace JetLagBRBot.Models;
 
@@ -32,6 +33,8 @@ public class Team<TeamGameState>(string name)
     
     public List<Guid> Players { get; set; } = [];
     
+    public Location? Location { get; set; }
+    
     public TeamGameState TeamGameStateData { get; set; }
 }
 
@@ -43,6 +46,8 @@ public class Player<PlayerGameState>(string nickname, int tgId)
     public int TelegramId { get; set; } = tgId;
 
     public string Nickname { get; set; } = nickname;
+    
+    public Location? Location { get; set; }
     
     public PlayerGameState PlayerGameStateData { get; set; }
 }

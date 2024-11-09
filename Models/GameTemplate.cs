@@ -1,10 +1,9 @@
 namespace JetLagBRBot.Models;
 
-public class GameTemplate(string gameMode, string name, string filePath)
+public class GameTemplate(GameTemplateConfigFile config, string filePath)
 {
-    public Guid id { get; set; } = Guid.NewGuid();
-    public string GameMode { get; set; } = gameMode;
-    public string Name { get; set; } = name;
+    public Guid id { get; private set; } = Guid.NewGuid();
+    public GameTemplateConfigFile Config { get; set; } = config;
     public string FilePath { get; set; } = filePath;
 }
 
@@ -12,4 +11,8 @@ public class GameTemplateConfigFile
 {
     public string GameMode { get; set; }
     public string Name { get; set; }
+    public TimeSpan Duration { get; set; }
+    public TimeSpan? ProtectionPhase { get; set; }
+    public TimeSpan? TagFreeze { get; set; }
+    public TimeSpan? AfterTagProtection { get; set; }
 }

@@ -8,23 +8,22 @@ namespace JetLagBRBot.Services;
 
 public interface ITelegramBotService
 {
-    public event EventHandler<Message> OnUserLocation; 
+    public TelegramBotClient Client { get; }
+    public event EventHandler<Message> OnUserLocation;
+    public Task UpdateCommands();
 }
 
 public class TelegramBotService : ITelegramBotService
 {
-    private readonly TelegramBotClient _client;
-    
-    private readonly List<BotCommand> Commands = new();
-
+    public TelegramBotClient Client { get; private set; }
     public event EventHandler<Message> OnUserLocation; 
     
-    public event EventHandler<KeyValuePair<Message, BotCommand>> OnCommand;
-
-    public event EventHandler<KeyValuePair<Message, Document>> OnDocument;
+    private readonly ICommandService _commandService;
     
-    public TelegramBotService(IConfiguration config)
+    public TelegramBotService(IConfiguration config, ICommandService commandService)
     {
+        this._commandService = commandService;
+        
         string? token = config.GetValue<string>("TG_API_KEY");
 
         if (string.IsNullOrEmpty(token))
@@ -32,15 +31,15 @@ public class TelegramBotService : ITelegramBotService
             throw new NullReferenceException("Telegram API Key missing");
         }
         
-        this._client = new TelegramBotClient(token);
+        this.Client = new TelegramBotClient(token);
 
-        User user = this._client.GetMeAsync().Result;
+        User user = this.Client.GetMeAsync().Result;
         
         Console.WriteLine("Telegram bot loaded");
         Console.WriteLine("id: " + user.Id);
         
-        this._client.OnMessage += this.OnMessage;
-        this._client.OnUpdate += this.OnUpdate;
+        this.Client.OnMessage += this.OnMessage;
+        this.Client.OnUpdate += this.OnUpdate;
     }
     
     private async Task OnMessage(Message msg, UpdateType type)
@@ -53,49 +52,30 @@ public class TelegramBotService : ITelegramBotService
         // Is a command
         else if (msg.Type == MessageType.Text && msg.Text.StartsWith("/"))
         {
-            string rawCmd = msg.Text.Substring(1);
+            bool commandExists = await this._commandService.HandleCommand(msg, type);
 
-            var cmd = this.Commands.Find(x => x.Command == rawCmd);
-            
-            if (cmd == null)
+            if (!commandExists)
             {
-                await this._client.SendTextMessageAsync(msg.Chat.Id, "Command not found");
+                await this.Client.SendTextMessageAsync(msg.Chat.Id, "Command not found");
             }
-            
-            this.OnCommand.Invoke(this, new KeyValuePair<Message, BotCommand>(msg, cmd));
         }
     }
 
-    private Task OnUpdate(Update update)
+    private async Task OnUpdate(Update update)
     {
-        return Task.CompletedTask;
-    }
-
-    private void UpdateCommands()
-    {
-        this._client.DeleteMyCommands();
-        this._client.SetMyCommands(this.Commands);
-    }
-    
-    /// <summary>
-    /// Add a single command to the already existing command list
-    /// </summary>
-    /// <param name="cmd">command</param>
-    public void AddCommand(BotCommand cmd)
-    {
-        this.Commands.Add(cmd);
-    }
-
-    /// <summary>
-    /// Clears the current command list and add new ones
-    /// </summary>
-    /// <param name="commands">List of new commands</param>
-    public void SetCommands(List<BotCommand> commands)
-    {
-        this.Commands.Clear();
-        foreach (var cmd in commands)
+        if (update.Type == UpdateType.CallbackQuery)
         {
-            this.Commands.Add(cmd);
+            await this._commandService.HandleCallbackQuery(update);
+            this.Client.AnswerCallbackQuery(update.CallbackQuery.Id);
         }
+    }
+
+    /// <summary>
+    /// Gets all commands from command service and sets them in the bot
+    /// </summary>
+    public async Task UpdateCommands()
+    {
+        //await this.Client.DeleteMyCommands();
+        await this.Client.SetMyCommands(this._commandService.GetBotCommands());
     }
 }

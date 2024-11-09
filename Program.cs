@@ -1,3 +1,4 @@
+using JetLagBRBot.Game;
 using JetLagBRBot.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,17 +13,21 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ITelegramBotService, TelegramBotService>();
 builder.Services.AddSingleton<IGameTemplateService, GameTemplateService>();
 builder.Services.AddSingleton<IGameLogService, GameLogService>();
+builder.Services.AddSingleton<IGameManagerService, GameManagerService>();
+builder.Services.AddSingleton<ICommandService, CommandService>();
 
 var app = builder.Build();
 
+// init game templates
+IGameTemplateService gameTemplateService = app.Services.GetService<IGameTemplateService>();
+var templateLog = gameTemplateService.ReloadTemplates();
+Console.WriteLine(String.Join("\n", templateLog.ToArray()));
+
+// init game manager
+app.Services.GetService<IGameManagerService>();
+
 // init telegram bot
 app.Services.GetService<ITelegramBotService>();
-
-IGameTemplateService gameTemplateService = app.Services.GetService<IGameTemplateService>();
-
-var templateLog = gameTemplateService.ReloadTemplates();
-
-Console.WriteLine(String.Join("\n", templateLog.ToArray()));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
