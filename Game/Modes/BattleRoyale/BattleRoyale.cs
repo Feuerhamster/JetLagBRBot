@@ -7,7 +7,7 @@ namespace JetLagBRBot.GameModes.BattleRoyale;
 
 public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateData, PlayerOrTeamStateData>
 {
-    public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, IServiceProvider services) : base(template, services)
+    public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, long telegramGroupId, IServiceProvider services) : base(template, telegramGroupId, services)
     {
 
     }

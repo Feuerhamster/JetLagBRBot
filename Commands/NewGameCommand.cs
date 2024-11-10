@@ -7,7 +7,7 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace JetLagBRBot.Commands;
 
-public class NewGameCommand(ITelegramBotService telegramBotService, IGameTemplateService gameTemplateService)
+public class NewGameCommand(ITelegramBotService telegramBotService, IGameTemplateService gameTemplateService, IGameManagerService gameManagerService)
     : ICustomBotCommand
 {
     public string Command { get; } = "newgame";
@@ -63,6 +63,8 @@ public class NewGameCommand(ITelegramBotService telegramBotService, IGameTemplat
             );
             return;
         }
+        
+        gameManagerService.InitNewGame(t.id, update.Message.Chat.Id);
         
         await telegramBotService.Client.SendMessage(
             update.CallbackQuery.Message.Chat.Id,

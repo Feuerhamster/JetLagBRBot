@@ -9,12 +9,12 @@ namespace JetLagBRBot.Services;
 
 public interface IGameManagerService
 {
-    public void InitNewGame(Guid templateId, int tgGroupId);
+    public void InitNewGame(Guid templateId, long tgGroupId);
 }
 
 public class GameManagerService : IGameManagerService
 {
-    public IBaseGame? CurrentGame { get; set; }
+    private IBaseGame CurrentGame { get; set; }
     
     private readonly IGameTemplateService _gameTemplateService;
     
@@ -30,16 +30,16 @@ public class GameManagerService : IGameManagerService
         telegramBotService.UpdateCommands();
     }
 
-    public void InitNewGame(Guid templateId, int tgGroupId)
+    public void InitNewGame(Guid templateId, long tgGroupId)
     {
-        var t = this._gameTemplateService.GetGameTemplate(templateId);
-        var d = this._gameTemplateService.LoadGameData<BattleRoyaleGameData>(templateId);
+        var template = this._gameTemplateService.GetGameTemplate(templateId);
+        var data = this._gameTemplateService.LoadGameData<BattleRoyaleGameData>(templateId);
 
-        switch (t.Config.GameMode)
+        switch (template.Config.GameMode)
         {
             case "BattleRoyale":
             {
-                this.CurrentGame = new BattleRoyaleGamemode(t, d, this._serviceProvider);
+                this.CurrentGame = new BattleRoyaleGamemode(template, data, tgGroupId, this._serviceProvider);
                 break;
             }
         }

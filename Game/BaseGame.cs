@@ -5,6 +5,8 @@ namespace JetLagBRBot.Game;
 
 public interface IBaseGame
 {
+    public void PlayerJoin(int telegramId, string nickname);
+    public bool LeavePlayer(int telegramId);
 }
 
 public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBaseGame
@@ -17,10 +19,10 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
 
     protected List<Player<PlayerGameState>> Players { get; private set; } = new();
     
-    protected BaseGame(GameTemplate template, IServiceProvider serviceProvider)
+    protected BaseGame(GameTemplate template, long telegramGroupId, IServiceProvider serviceProvider)
     {
         this._telegramBot = serviceProvider.GetService<ITelegramBotService>();
-        this.Game = new Game<GameState>();
+        this.Game = new Game<GameState>(template.Config.Name, telegramGroupId);
     }
 
     /// <summary>

@@ -12,7 +12,7 @@ public enum EGameStatus
     Finished
 }
 
-public class Game<GameState>(string name, int telegramGroupId)
+public class Game<GameState>(string name, long telegramGroupId)
 {
     [BsonId] public Guid Id { get; set; } = new Guid();
 
@@ -20,7 +20,7 @@ public class Game<GameState>(string name, int telegramGroupId)
     
     public EGameStatus Status { get; set; } = EGameStatus.NotStarted;
 
-    public int TelegramGroupId { get; set; } = telegramGroupId;
+    public long TelegramGroupId { get; set; } = telegramGroupId;
 
     public GameState GameStateData { get; set; }
 }
