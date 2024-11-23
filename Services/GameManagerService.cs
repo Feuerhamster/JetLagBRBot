@@ -10,6 +10,8 @@ namespace JetLagBRBot.Services;
 public interface IGameManagerService
 {
     public void InitNewGame(Guid templateId, long tgGroupId);
+
+    public G? GetCurrentGame<G>(string gameMode) where G : class;
 }
 
 public class GameManagerService : IGameManagerService
@@ -27,6 +29,8 @@ public class GameManagerService : IGameManagerService
         
         commandService.AddCommand<NewGameCommand>();
         commandService.AddCommand<ReloadTemplatesCommand>();
+        commandService.AddCommand<JoinCommand>();
+        commandService.AddCommand<LeaveCommand>();
         telegramBotService.UpdateCommands();
     }
 
@@ -37,11 +41,21 @@ public class GameManagerService : IGameManagerService
 
         switch (template.Config.GameMode)
         {
-            case "BattleRoyale":
+            case BattleRoyaleGamemode.GameModeName:
             {
                 this.CurrentGame = new BattleRoyaleGamemode(template, data, tgGroupId, this._serviceProvider);
                 break;
             }
         }
+    }
+
+    public G? GetCurrentGame<G>(string? gameMode) where G : class
+    {
+        if (gameMode != null && this.CurrentGame.GameTemplate.Config.GameMode != gameMode)
+        {
+            throw new InvalidCastException("Requested game mode does not correspond to current game");
+        }
+        
+        return this.CurrentGame as G;
     }
 }

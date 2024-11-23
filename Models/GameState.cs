@@ -38,12 +38,12 @@ public class Team<TeamGameState>(string name)
     public TeamGameState TeamGameStateData { get; set; }
 }
 
-public class Player<PlayerGameState>(string nickname, int tgId)
+public class Player<PlayerGameState>(string nickname, long tgId)
 {
     [BsonId]
     public Guid Id { get; set; } = new Guid();
 
-    public int TelegramId { get; set; } = tgId;
+    public long TelegramId { get; set; } = tgId;
 
     public string Nickname { get; set; } = nickname;
     
