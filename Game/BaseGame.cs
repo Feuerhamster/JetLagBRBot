@@ -1,5 +1,6 @@
 using JetLagBRBot.Models;
 using JetLagBRBot.Services;
+using JetLagBRBot.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -18,7 +19,7 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
     
     public Game<GameState> Game { get; private set; }
 
-    private Timer GameTimer;
+    private ManagedTimer GameTimer;
     
     public GameTemplate GameTemplate { get; }
 
@@ -34,7 +35,7 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
         this._telegramBot = serviceProvider.GetService<ITelegramBotService>();
         this.Game = new Game<GameState>(template.Config.Name, telegramGroupId);
         this.GameTemplate = template;
-        this.GameTimer = new Timer(template.Config.Duration);
+        this.GameTimer = new ManagedTimer(template.Config.Duration);
     }
 
     /// <summary>
@@ -70,6 +71,11 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
         this.GameTimer.Stop();
         this.OnGameStop.Invoke(this, EventArgs.Empty);
         this.BroadcastMessage("\ud83d\udd34 The game has been stopped!");
+    }
+
+    public void ResetGame()
+    {
+        this.GameTimer.Reset();
     }
 
     /// <summary>
