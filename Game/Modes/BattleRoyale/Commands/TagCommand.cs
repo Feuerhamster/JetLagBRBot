@@ -3,7 +3,7 @@ using JetLagBRBot.Services;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
-namespace JetLagBRBot.Commands;
+namespace JetLagBRBot.GameModes.BattleRoyale.Commands;
 
 public class TagCommand(ITelegramBotService telegramBotService) : CustomBotCommandBase(telegramBotService)
 {

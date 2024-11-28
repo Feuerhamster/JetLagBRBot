@@ -13,6 +13,4 @@ public class GameTemplateConfigFile
     public string Name { get; set; }
     public TimeSpan Duration { get; set; }
     public TimeSpan? ProtectionPhase { get; set; }
-    public TimeSpan? TagFreeze { get; set; }
-    public TimeSpan? AfterTagProtection { get; set; }
 }
