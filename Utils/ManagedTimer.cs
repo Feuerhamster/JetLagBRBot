@@ -54,7 +54,7 @@ public class ManagedTimer
         this.OnTick?.Invoke(this, EventArgs.Empty);
         
         // check if timer has finished
-        if (this.TimeStarted >= DateTime.Now.Add(this.Duration))
+        if (DateTime.Now >= this.TimeStarted.Add(this.Duration))
         {
             this.OnFinished?.Invoke(this, EventArgs.Empty);
             this.Reset();

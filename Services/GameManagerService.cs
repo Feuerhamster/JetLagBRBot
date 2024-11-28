@@ -29,8 +29,9 @@ public class GameManagerService : IGameManagerService
         
         commandService.AddCommand<NewGameCommand>();
         commandService.AddCommand<ReloadTemplatesCommand>();
-        commandService.AddCommand<JoinCommand>();
+        commandService.AddCommand<JoinCommandBase>();
         commandService.AddCommand<LeaveCommand>();
+        commandService.AddCommand<GameStartCommand>();
         telegramBotService.UpdateCommands();
     }
 

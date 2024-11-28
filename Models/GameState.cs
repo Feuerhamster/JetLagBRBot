@@ -8,7 +8,7 @@ public enum EGameStatus
     NotStarted,
     ProtectionPhase,
     Running,
-    Paused,
+    Stopped,
     Finished
 }
 

@@ -1,4 +1,5 @@
 using System.Text;
+using JetLagBRBot.Models;
 using JetLagBRBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -6,11 +7,11 @@ using Telegram.Bot.Types.Enums;
 
 namespace JetLagBRBot.Commands;
 
-public class ReloadTemplatesCommand(IGameTemplateService templateService, ITelegramBotService telegramBotService) : ICustomBotCommand
+public class ReloadTemplatesCommand(IGameTemplateService templateService, ITelegramBotService telegramBotService) : CustomBotCommandBase(telegramBotService)
 {
-    public string Command { get; } = "reload_templates";
-    public string Description { get; } = "Reload all game template files";
-    public async Task Execute(Message msg, UpdateType type)
+    public override string Command { get; } = "reload_templates";
+    public override string Description { get; } = "Reload all game template files";
+    public override async Task Execute(Message msg, UpdateType type)
     {
         List<string> reloadLog = templateService.ReloadTemplates();
 
@@ -23,10 +24,5 @@ public class ReloadTemplatesCommand(IGameTemplateService templateService, ITeleg
         }
         
         telegramBotService.Client.SendMessage(msg.Chat.Id, text.ToString());
-    }
-
-    public Task OnCallbackQuery(Update update, string? payloadData)
-    {
-        return Task.CompletedTask;
     }
 }

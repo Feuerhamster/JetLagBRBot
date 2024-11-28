@@ -1,4 +1,5 @@
 using JetLagBRBot.Game;
+using JetLagBRBot.Models;
 using JetLagBRBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -6,12 +7,12 @@ using Telegram.Bot.Types.Enums;
 
 namespace JetLagBRBot.Commands;
 
-public class JoinCommand(IGameManagerService gameManagerService, ITelegramBotService telegramBotService) : ICustomBotCommand
+public class JoinCommandBase(IGameManagerService gameManagerService, ITelegramBotService telegramBotService) : CustomBotCommandBase(telegramBotService)
 {
-    public string Command { get; } = "join";
-    public string Description { get; } = "Join the current game";
+    public override string Command { get; } = "join";
+    public override string Description { get; } = "Join the current game";
     
-    public async Task Execute(Message msg, UpdateType type)
+    public async override Task Execute(Message msg, UpdateType type)
     {
         string name = $"{msg.From.FirstName} {msg.From.LastName}";
 
@@ -29,10 +30,5 @@ public class JoinCommand(IGameManagerService gameManagerService, ITelegramBotSer
 
         telegramBotService.Client.SendMessage(msg.Chat.Id,
             $"Successfully joined the game \"{CurrentGame.GameTemplate.Config.Name}\"");
-    }
-
-    public Task OnCallbackQuery(Update update, string? payloadData)
-    {
-        return Task.CompletedTask;
     }
 }

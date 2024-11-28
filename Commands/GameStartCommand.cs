@@ -7,15 +7,22 @@ using Telegram.Bot.Types.Enums;
 
 namespace JetLagBRBot.Commands;
 
-public class LeaveCommand(IGameManagerService gameManagerService, ITelegramBotService telegramBotService) : CustomBotCommandBase(telegramBotService)
+public class GameStartCommand(IGameManagerService gameManagerService, ITelegramBotService telegramBotService) : CustomBotCommandBase(telegramBotService)
 {
-    public override string Command { get; } = "leave";
-    public override string Description { get; } = "leave the current game";
+    public override string Command { get; } = "start_game";
+    public override string Description { get; } = "Starts the game that is currently initialized in the group";
+
+    public override ICustomBotCommandConstraint[] Constraints { get; } =
+    [
+        new ChatTypeConstraint(ChatType.Group),
+        new OnlyGroupAdminConstraint()
+    ];
+
     public override async Task Execute(Message msg, UpdateType type)
     {
         var CurrentGame =
             gameManagerService.GetCurrentGame<BaseGame<object, object, object>>(null);
-        
+
         if (CurrentGame == null)
         {
             telegramBotService.Client.SendMessage(msg.Chat.Id,
@@ -23,12 +30,6 @@ public class LeaveCommand(IGameManagerService gameManagerService, ITelegramBotSe
             return;
         }
         
-        bool hasLeft = CurrentGame.LeavePlayer(msg.From.Id);
-
-
-        telegramBotService.Client.SendMessage(msg.Chat.Id,
-            hasLeft
-                ? $"Successfully left the game \"{CurrentGame.GameTemplate.Config.Name}\""
-                : $"Failed to leave game. Maybe you never joined?");
+        CurrentGame.StartGame();
     }
 }

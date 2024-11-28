@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using JetLagBRBot.Models;
 using JetLagBRBot.Utils;
 using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
@@ -6,27 +7,21 @@ using Telegram.Bot.Types.Enums;
 
 namespace JetLagBRBot.Services;
 
-public interface ICustomBotCommand
-{
-    public string Command { get; }
-    public string Description { get; }
-    public Task Execute(Message msg, UpdateType type);
-    public Task OnCallbackQuery(Update update, string? payloadData);
-}
-
 public interface ICommandService
 {
     public List<BotCommand> GetBotCommands();
-    public void AddCommand<C>() where C : ICustomBotCommand;
+    public void AddCommand<C>() where C : CustomBotCommandBase;
     public Task<bool> HandleCommand(Message msg, UpdateType type);
     public Task<bool> HandleCallbackQuery(Update update);
 }
 
 public class CommandService(IServiceProvider serviceProvider) : ICommandService
 {
-    private readonly Dictionary<string, ICustomBotCommand> Commands = new();
+    private readonly Dictionary<string, CustomBotCommandBase> Commands = new();
 
     private readonly Regex commandMatcher = new Regex(@"/([a-z0-9_]+)");
+
+    private readonly ITelegramBotService _telegramBotService = serviceProvider.GetService<ITelegramBotService>();
 
     public List<BotCommand> GetBotCommands()
     {
@@ -51,7 +46,7 @@ public class CommandService(IServiceProvider serviceProvider) : ICommandService
     /// Add command with automatic dependency injection of services
     /// </summary>
     /// <typeparam name="C"></typeparam>
-    public void AddCommand<C>() where C : ICustomBotCommand
+    public void AddCommand<C>() where C : CustomBotCommandBase
     {
         var cmd = ActivatorUtilities.CreateInstance<C>(serviceProvider);
         this.Commands.Add(cmd.Command, cmd);
@@ -63,14 +58,20 @@ public class CommandService(IServiceProvider serviceProvider) : ICommandService
 
         if (!match.Success) return false;
         
-        string command = match.Groups[1].Value;
-        
-        if (!this.Commands.TryGetValue(command, out var command1))
+        if (!this.Commands.TryGetValue(match.Groups[1].Value, out var command))
         {
             return false;
         }
+
+        // Handle constraints
+        foreach (var constraint in command.Constraints)
+        {
+            var res = await constraint.Execute(_telegramBotService, msg);
+
+            if (res == false) return false;
+        }
         
-        command1.Execute(msg, type);
+        command.Execute(msg, type);
         return true;
     }
 

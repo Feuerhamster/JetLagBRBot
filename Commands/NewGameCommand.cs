@@ -1,3 +1,4 @@
+using JetLagBRBot.Models;
 using JetLagBRBot.Services;
 using JetLagBRBot.Utils;
 using Telegram.Bot;
@@ -8,33 +9,19 @@ using Telegram.Bot.Types.ReplyMarkups;
 namespace JetLagBRBot.Commands;
 
 public class NewGameCommand(ITelegramBotService telegramBotService, IGameTemplateService gameTemplateService, IGameManagerService gameManagerService)
-    : ICustomBotCommand
+    : CustomBotCommandBase(telegramBotService)
 {
-    public string Command { get; } = "newgame";
-    public string Description { get; } = "Create a new game based on a template";
+    public override string Command { get; } = "newgame";
+    public override string Description { get; } = "Create a new game based on a template";
 
-    public async Task Execute(Message msg, UpdateType type)
+    public override ICustomBotCommandConstraint[] Constraints { get; } =
+    [
+        new ChatTypeConstraint(ChatType.Group),
+        new OnlyGroupAdminConstraint()
+    ];
+
+    public override async Task Execute(Message msg, UpdateType type)
     {
-        if (msg.Chat.Type != ChatType.Group)
-        {
-            await telegramBotService.Client.SendMessage(
-                msg.Chat.Id,
-                "A new game can only be created within in a group"
-            );
-            return;
-        }
-
-        var admins = await telegramBotService.Client.GetChatAdministrators(msg.Chat.Id);
-
-        if (admins.FirstOrDefault(c => c.User.Id == msg.From.Id) == null)
-        {
-            await telegramBotService.Client.SendMessage(
-                msg.Chat.Id,
-                "Only group admins can use this command"
-            );
-            return;
-        }
-        
         var keyboard = new InlineKeyboardChoiceFactory(this.Command);
 
         var templates = gameTemplateService.GetTemplateList();

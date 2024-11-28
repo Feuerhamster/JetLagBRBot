@@ -4,7 +4,6 @@ using JetLagBRBot.Services;
 
 namespace JetLagBRBot.GameModes.BattleRoyale;
 
-
 public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateData, PlayerOrTeamStateData>
 {
     public const string GameModeName = "BattleRoyale";
