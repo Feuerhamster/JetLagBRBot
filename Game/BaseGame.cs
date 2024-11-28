@@ -2,6 +2,7 @@ using JetLagBRBot.Models;
 using JetLagBRBot.Services;
 using JetLagBRBot.Utils;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace JetLagBRBot.Game;
@@ -30,9 +31,12 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
         this._telegramBot = serviceProvider.GetService<ITelegramBotService>();
         this.Game = new Game<GameState>(template.Config.Name, telegramGroupId);
         this.GameTemplate = template;
+        
         this.GameTimer = new ManagedTimer(template.Config.Duration);
         this.GameTimer.OnTick += this.Tick;
         this.GameTimer.OnFinished += this.GameEnd;
+
+        this._telegramBot.OnUserLocation += OnUserLocation;
     }
 
     private void Tick(object sender, EventArgs e)
@@ -50,6 +54,15 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
             this.Game.Status = EGameStatus.Running;
             this.BroadcastMessage("\u2622\ufe0f Protection phase is over!");
         }
+    }
+
+    private void OnUserLocation(object? sender, Message msg)
+    {
+        var p = this.Players.FirstOrDefault(p => p.TelegramId == msg.From.Id);
+
+        if (p == null) return;
+
+        p.Location = msg.Location;
     }
 
     private void GameEnd(object sender, EventArgs e)
@@ -121,6 +134,7 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
     {
         this.GameTimer.Reset();
         this.Game = new Game<GameState>(GameTemplate.Config.Name, this.Game.TelegramGroupId);
+        this.Players.Clear();
         this.BroadcastMessage("ℹ\ufe0f The game has been reset!");
     }
 
