@@ -26,7 +26,7 @@ public interface IPowerUp
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public void Use(IServiceProvider serviceProvider);
+    public Task<bool> Use(BattleRoyaleGamemode gamemode, IServiceProvider serviceProvider);
     public EPowerupActivator Activator { get; set; }
     public bool IsActive { get; set; }
 }

@@ -16,20 +16,23 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     
     private readonly ITelegramBotService _telegramBot;
     
+    private readonly IServiceProvider _services;
+    
     public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, long telegramGroupId, IServiceProvider services) : base(template, telegramGroupId, services)
     {
         this.TimeBetweenDrops = data.TimeBetweenDrops;
+        this._services = services;
         this.Game.GameStateData.Landmarks = new(data.Landmarks);
         
-        var commandService = services.GetService<ICommandService>();
-        this._telegramBot = services.GetService<ITelegramBotService>();
+        var commandService = services.GetRequiredService<ICommandService>();
+        this._telegramBot = services.GetRequiredService<ITelegramBotService>();
         
         commandService.AddCommand<TagCommand>();
 
         this.GameTimer.OnTick += this.Tick;
     }
     
-    private void Tick(object sender, EventArgs e)
+    private void Tick(object? sender, EventArgs e)
     {
         this.CheckForNextLandmark();
     }
@@ -43,7 +46,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         this.NewLandmark();
     }
 
-    private void NewLandmark()
+    private async Task NewLandmark()
     {
         var rand = new Random();
         
@@ -68,9 +71,42 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         message.AppendLine($"Location: **[{newLandmark.Coordinates[0]}, {newLandmark.Coordinates[1]}]({locationLink})**");
 
-        this.BroadcastMessage(message.ToString());
+        await this.BroadcastMessage(message.ToString());
         
         var fileStream = System.IO.File.OpenRead(newLandmark.Image);
-        this._telegramBot.Client.SendPhoto(this.Game.TelegramGroupId, new InputFileStream(fileStream));
+        await this._telegramBot.Client.SendPhoto(this.Game.TelegramGroupId, new InputFileStream(fileStream));
+    }
+
+    public async Task TagPlayer(Guid taggerId, Guid victimId)
+    {
+        var victim = this.Players.FirstOrDefault(p => p.Id.Equals(victimId));
+        var tagger = this.Players.FirstOrDefault(p => p.Id.Equals(taggerId));
+        
+        if (victim == null || tagger == null) return;
+        
+        // check for powerups
+        var victimPowerup =
+            victim.PlayerGameStateData.Powerups.FirstOrDefault(p =>
+                p is { Activator: EPowerupActivator.OnTagged, IsActive: true });
+        
+        var taggerPowerup =
+            tagger.PlayerGameStateData.Powerups.FirstOrDefault(p =>
+                p is { Activator: EPowerupActivator.OnTagged, IsActive: true });
+
+        if (victimPowerup != null)
+        {
+            var cancel = await victimPowerup.Use(this, this._services);
+
+            if (cancel) return;
+        }
+        
+        if (taggerPowerup != null)
+        {
+            var cancel = await taggerPowerup.Use(this, this._services);
+
+            if (cancel) return;
+        }
+        
+        this.Game.GameStateData.PlayerTags.Add(new KeyValuePair<Guid, Guid>(tagger.Id, victim.Id));
     }
 }

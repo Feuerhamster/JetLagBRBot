@@ -24,7 +24,7 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
 
     // protected List<Team<TeamGameState>> Teams { get; private set; } = new();
 
-    protected List<Player<PlayerGameState>> Players { get; } = new();
+    public List<Player<PlayerGameState>> Players { get; private set; } = new();
     
     protected BaseGame(GameTemplate template, long telegramGroupId, IServiceProvider serviceProvider)
     {
