@@ -1,6 +1,6 @@
 using JetLagBRBot.Commands;
 using JetLagBRBot.Game;
-using JetLagBRBot.GameModes.BattleRoyale;
+using JetLagBRBot.Game.Modes.BattleRoyale;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -40,12 +40,12 @@ public class GameManagerService : IGameManagerService
     public void InitNewGame(Guid templateId, long tgGroupId)
     {
         var template = this._gameTemplateService.GetGameTemplate(templateId);
-        var data = this._gameTemplateService.LoadGameData<BattleRoyaleGameData>(templateId);
 
         switch (template.Config.GameMode)
         {
             case BattleRoyaleGamemode.GameModeName:
             {
+                var data = this._gameTemplateService.LoadGameData<BattleRoyaleGameData>(templateId);
                 this.CurrentGame = new BattleRoyaleGamemode(template, data, tgGroupId, this._serviceProvider);
                 break;
             }

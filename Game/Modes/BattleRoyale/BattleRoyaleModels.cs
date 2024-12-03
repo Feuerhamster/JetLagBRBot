@@ -1,34 +1,35 @@
-namespace JetLagBRBot.GameModes.BattleRoyale;
+namespace JetLagBRBot.Game.Modes.BattleRoyale;
 
 
 public class GameStateData
 {
-    public List<Landmark> Landmarks;
+    public List<Landmark> Landmarks = new();
 
     /// <summary>
     /// Key is the tagger and value the victim
     /// </summary>
-    public List<KeyValuePair<Guid, Guid>> PlayerTags;
+    public List<PlayerTag> PlayerTags = new();
 
-    public DateTime LastTimeDropped;
+    public DateTime LastTimeDropped = DateTime.MinValue;
     
-    public Landmark CurrentActiveLandmark;
+    public Landmark? CurrentActiveLandmark = null;
 }
 
-public enum EPowerupActivator
+public class PlayerTag(Guid taggerId, Guid victimId)
 {
-    OnTag,
-    OnTagged,
-    Instant,
+    public Guid TagId { get; set; } = Guid.NewGuid();
+    public DateTime TagTime { get; set; } = DateTime.Now;
+    public Guid TaggerId { get; set; } = taggerId;
+    public Guid VictimId { get; set; } = victimId;
 }
 
 public interface IPowerUp
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
-    public Task<bool> Use(BattleRoyaleGamemode gamemode, IServiceProvider serviceProvider);
-    public EPowerupActivator Activator { get; set; }
+    public string Name { get; }
     public bool IsActive { get; set; }
+    public Task OnActivate();
+    public Task OnDispose();
 }
 
 public class PlayerOrTeamStateData
@@ -44,6 +45,8 @@ public class Landmark(double latitude, double longitude, string name, string dis
     public string Name { get; set; } = name;
     public string District { get; set; } = district;
     public string Image { get; set; } = image;
+    
+    public bool Claimed { get; set; } = false;
 }
 
 public class BattleRoyaleGameData

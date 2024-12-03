@@ -3,6 +3,7 @@ using JetLagBRBot.Services;
 using JetLagBRBot.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace JetLagBRBot.Game;
@@ -144,6 +145,6 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
     /// <param name="message">text message for the group</param>
     public async Task BroadcastMessage(string message, IReplyMarkup replyMarkup = null)
     {
-        this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup);
+        this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
     }
 }

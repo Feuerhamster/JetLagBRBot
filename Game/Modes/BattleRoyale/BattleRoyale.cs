@@ -1,12 +1,13 @@
 using System.Text;
 using JetLagBRBot.Game;
-using JetLagBRBot.GameModes.BattleRoyale.Commands;
+using JetLagBRBot.Game.Modes.BattleRoyale.Commands;
 using JetLagBRBot.Models;
 using JetLagBRBot.Services;
+using JetLagBRBot.Utils;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 
-namespace JetLagBRBot.GameModes.BattleRoyale;
+namespace JetLagBRBot.Game.Modes.BattleRoyale;
 
 public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateData, PlayerOrTeamStateData>
 {
@@ -85,7 +86,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         if (victim == null || tagger == null) return;
         
         // check for powerups
-        var victimPowerup =
+        /*var victimPowerup =
             victim.PlayerGameStateData.Powerups.FirstOrDefault(p =>
                 p is { Activator: EPowerupActivator.OnTagged, IsActive: true });
         
@@ -105,8 +106,27 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             var cancel = await taggerPowerup.Use(this, this._services);
 
             if (cancel) return;
-        }
+        }*/
         
-        this.Game.GameStateData.PlayerTags.Add(new KeyValuePair<Guid, Guid>(tagger.Id, victim.Id));
+        this.Game.GameStateData.PlayerTags.Add(new PlayerTag(tagger.Id, victim.Id));
+    }
+
+    public async Task<bool> ClaimLandmark(Guid claimerId)
+    {
+        var lm = this.Game.GameStateData.CurrentActiveLandmark;
+        
+        if (lm == null || lm.Claimed == true)
+        {
+            return false;
+        }
+
+        var claimer = this.Players.FirstOrDefault(p => p.Id.Equals(claimerId));
+
+        if (claimer == null) return false;
+        
+        // TODO: implement actual powerup claim
+        
+        this.BroadcastMessage($"\ud83c\udf1f {TgFormatting.UserMention(claimer.TelegramId, claimer.Nickname)} claimed the PowerUp at the current Landmark \"{lm.Name}\"");
+        return true;
     }
 }

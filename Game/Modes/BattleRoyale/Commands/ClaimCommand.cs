@@ -7,7 +7,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace JetLagBRBot.Game.Modes.BattleRoyale.Commands;
 
-public class TagCommand(ITelegramBotService bot, IGameManagerService gameManagerService) : CustomBotCommandBase(bot)
+public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManagerService) : CustomBotCommandBase(bot)
 {
     public override string Command { get; } = "tag";
     public override string Description { get; } = "Tags a player";
@@ -25,12 +25,13 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
         
         foreach (var player in currentGame.Players)
         {
-            keyboard.AddChoice(player.Nickname, player.Id.ToString());
+            keyboard.AddChoice("Yes", bool.TrueString);
+            keyboard.AddChoice("No", bool.FalseString);
         }
         
         bot.Client.SendMessage(
             msg.Chat.Id,
-            "Please select the player you wanna tag.\n**You have to post a photo of them on which they can be identified into the game chat group!**",
+            "Are you at the current landmark, have taken a photo of you in front of the landmark and posted it into the game chat group?",
             replyMarkup: keyboard.GetKeyboardMarkup()
         );
     }
@@ -40,30 +41,12 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
         var currentGame =
             gameManagerService.GetCurrentGame<BattleRoyaleGamemode>(BattleRoyaleGamemode.GameModeName);
 
-        var victim = currentGame.Players.FirstOrDefault(p => p.Id == new Guid(payloadData));
-        
-        if (victim == null)
+        if (payloadData != bool.TrueString)
         {
-            await bot.Client.SendMessage(
-                update.CallbackQuery.Message.Chat.Id,
-                $"\u26a0\ufe0f Failed to select victim"
-            );
+            await bot.Client.DeleteMessage(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.Id);
             return;
         }
         
-        var tagger = currentGame.Players.FirstOrDefault(p => p.TelegramId == update.CallbackQuery.From.Id);
-
-        if (tagger == null)
-        {
-            await bot.Client.SendMessage(
-                update.CallbackQuery.Message.Chat.Id,
-                $"\u26a0\ufe0f Failed to fetch tagger"
-            );
-            return;
-        }
         
-        await currentGame.TagPlayer(tagger.Id, victim.Id);
-        
-        await bot.Client.DeleteMessage(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.Id);
     }
 }
