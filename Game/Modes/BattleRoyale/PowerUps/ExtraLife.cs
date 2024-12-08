@@ -2,23 +2,23 @@ namespace JetLagBRBot.Game.Modes.BattleRoyale.PowerUps;
 
 public class ExtraLifePowerup : IPowerUp
 {
-    public Guid Id { get; set; }
-    public string Name { get; set; }
+    public EPowerUp PowerUp { get; private set; }
+    public bool IsActive { get; private set; }
 
-    public ExtraLifePowerup()
+    public ExtraLifePowerup(BattleRoyaleGamemode game, IServiceProvider services)
     {
         
     }
     
     public Task OnActivate()
     {
-        throw new NotImplementedException();
+        this.IsActive = true;
+        return Task.CompletedTask;
     }
 
     public Task OnDispose()
     {
-        throw new NotImplementedException();
+        this.IsActive = false;
+        return Task.CompletedTask;
     }
-
-    public bool IsActive { get; set; }
 }

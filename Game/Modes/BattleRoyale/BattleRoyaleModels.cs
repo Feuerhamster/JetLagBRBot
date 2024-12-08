@@ -25,9 +25,8 @@ public class PlayerTag(Guid taggerId, Guid victimId)
 
 public interface IPowerUp
 {
-    public Guid Id { get; set; }
-    public string Name { get; }
-    public bool IsActive { get; set; }
+    public EPowerUp PowerUp { get; }
+    public bool IsActive { get; }
     public Task OnActivate();
     public Task OnDispose();
 }
