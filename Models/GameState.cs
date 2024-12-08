@@ -12,7 +12,7 @@ public enum EGameStatus
     Finished
 }
 
-public class Game<GameState>(string name, long telegramGroupId)
+public class Game<TGameState>(string name, long telegramGroupId)
 {
     [BsonId] public Guid Id { get; set; } = new Guid();
 
@@ -22,10 +22,10 @@ public class Game<GameState>(string name, long telegramGroupId)
 
     public long TelegramGroupId { get; set; } = telegramGroupId;
 
-    public GameState GameStateData { get; set; }
+    public TGameState GameStateData { get; set; }
 }
 
-public class Team<TeamGameState>(string name)
+public class Team<TTeamGameState>(string name)
 {
     public Guid Id { get; set; } = new Guid();
 
@@ -35,10 +35,16 @@ public class Team<TeamGameState>(string name)
     
     public Location? Location { get; set; }
     
-    public TeamGameState TeamGameStateData { get; set; }
+    public TTeamGameState TeamGameStateData { get; set; }
 }
 
-public class Player<PlayerGameState>(string nickname, long tgId)
+/// <summary>
+/// Player class for a game
+/// </summary>
+/// <param name="nickname">Name that gets displayed publicly throughout the game</param>
+/// <param name="tgId">Telegram user id of the player</param>
+/// <typeparam name="TPlayerGameState">Gamemode specific data</typeparam>
+public class Player<TPlayerGameState>(string nickname, long tgId)
 {
     [BsonId]
     public Guid Id { get; set; } = new Guid();
@@ -48,6 +54,6 @@ public class Player<PlayerGameState>(string nickname, long tgId)
     public string Nickname { get; set; } = nickname;
     
     public Location? Location { get; set; }
-    
-    public PlayerGameState PlayerGameStateData { get; set; }
+
+    public TPlayerGameState PlayerGameStateData { get; set; }
 }

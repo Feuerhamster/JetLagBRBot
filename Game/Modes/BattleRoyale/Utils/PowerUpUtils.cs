@@ -9,17 +9,17 @@ public enum EPowerUp
 
 public static class PowerUpUtils
 {
-    public static BasePowerUp? GetPowerUp(EPowerUp powerUp, BattleRoyaleGamemode battleRoyale, IServiceProvider serviceProvider)
+    public static BasePowerUp GetPowerUp(EPowerUp powerUp, BattleRoyaleGamemode battleRoyale, Guid ownerId)
     {
         switch (powerUp)
         {
             case EPowerUp.ExtraLife:
             {
-                return ActivatorUtilities.CreateInstance<ExtraLifePowerUp>(serviceProvider);
+                return new ExtraLifePowerUp(battleRoyale, ownerId);
             }
             default:
             {
-                return null;
+                throw new Exception("impossible powerup requested");
             }
         }
     }

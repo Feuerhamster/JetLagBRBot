@@ -9,7 +9,7 @@ public enum EPowerUpStatus
     Expired
 }
 
-public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId, string name)
+public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
     
@@ -17,7 +17,8 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId, s
     
     protected readonly BattleRoyaleGamemode Gamemode = gamemode;
     protected readonly Guid OwnerId = ownerId;
-    protected readonly string Name = name;
+    protected abstract string Name { get; }
+    protected abstract string Description { get; }
 
     public abstract void Use();
     

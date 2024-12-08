@@ -18,7 +18,8 @@ public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManag
 
         if (currentGame == null)
         {
-            bot.Client.SendMessage(msg.Chat.Id, "\u26a0\ufe0f Invalid Command: Gamemode not found");
+            await bot.Client.SendMessage(msg.Chat.Id, "\u26a0\ufe0f Invalid Command: Gamemode not found");
+            return;
         }
         
         var keyboard = new InlineKeyboardChoiceFactory(this.Command);
@@ -29,7 +30,7 @@ public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManag
             keyboard.AddChoice("No", bool.FalseString);
         }
         
-        bot.Client.SendMessage(
+        await bot.Client.SendMessage(
             msg.Chat.Id,
             "Are you at the current landmark, have taken a photo of you in front of the landmark and posted it into the game chat group?",
             replyMarkup: keyboard.GetKeyboardMarkup()
@@ -46,7 +47,11 @@ public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManag
             await bot.Client.DeleteMessage(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.Id);
             return;
         }
+
+        var p = currentGame.Players.FirstOrDefault(p => p.TelegramId == update.CallbackQuery.From.Id);
+
+        if (p == null) return;
         
-        
+        await currentGame.ClaimLandmark(p.Id);
     }
 }

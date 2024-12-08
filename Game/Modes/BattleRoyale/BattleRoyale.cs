@@ -1,6 +1,7 @@
 using System.Text;
 using JetLagBRBot.Game;
 using JetLagBRBot.Game.Modes.BattleRoyale.Commands;
+using JetLagBRBot.Game.Modes.BattleRoyale.Utils;
 using JetLagBRBot.Models;
 using JetLagBRBot.Services;
 using JetLagBRBot.Utils;
@@ -84,8 +85,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
     public async Task TagPlayer(Guid taggerId, Guid victimId)
     {
-        var victim = this.Players.FirstOrDefault(p => p.Id.Equals(victimId));
-        var tagger = this.Players.FirstOrDefault(p => p.Id.Equals(taggerId));
+        var victim = this.GetPlayerById(victimId);
+        var tagger = this.GetPlayerById(taggerId);
         
         if (victim == null || tagger == null) return;
         
@@ -114,20 +115,29 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         await this.BroadcastMessage($"\ud83d\udea9 Player {taggerMention} successfully tagged {victimMention}!");
     }
 
+    /// <summary>
+    /// Claim a landmark
+    /// </summary>
+    /// <param name="claimerId">Player id of the player who claims the landmark</param>
+    /// <returns>true if successful, false if failed</returns>
     public async Task<bool> ClaimLandmark(Guid claimerId)
     {
         var lm = this.Game.GameStateData.CurrentActiveLandmark;
         
-        if (lm == null || lm.Claimed == true)
+        if (lm == null || lm.Claimed)
         {
             return false;
         }
 
-        var claimer = this.Players.FirstOrDefault(p => p.Id.Equals(claimerId));
+        var claimer = this.GetPlayerById(claimerId);
 
         if (claimer == null) return false;
         
         // TODO: implement actual powerup claim
+        var randomPowerUp = PowerUpUtils.RandomPowerUp();
+        var powerUp = PowerUpUtils.GetPowerUp(randomPowerUp, this, claimer.Id);
+        
+        claimer.PlayerGameStateData.Powerups.Add(powerUp);
         
         this.BroadcastMessage($"\ud83c\udf1f {TgFormatting.UserMention(claimer.TelegramId, claimer.Nickname)} claimed the PowerUp at the current Landmark \"{lm.Name}\"");
         return true;

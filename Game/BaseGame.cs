@@ -152,10 +152,15 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
     /// Sends a message to the player
     /// </summary>
     /// <param name="message">text message for the player</param>
-    public async Task SendPlayerMessage(Guid player, string message, IReplyMarkup replyMarkup = null)
+    public async Task SendPlayerMessage(Guid playerId, string message, IReplyMarkup replyMarkup = null)
     {
-        var p = this.Players.FirstOrDefault(p => p.Id.Equals(player));
+        var p = this.GetPlayerById(playerId);
         
         await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
+    }
+
+    public Player<PlayerGameState>? GetPlayerById(Guid playerId)
+    {
+        return this.Players.FirstOrDefault(p => p.Id.Equals(playerId));
     }
 }

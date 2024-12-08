@@ -40,7 +40,7 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
         var currentGame =
             gameManagerService.GetCurrentGame<BattleRoyaleGamemode>(BattleRoyaleGamemode.GameModeName);
 
-        var victim = currentGame.Players.FirstOrDefault(p => p.Id == new Guid(payloadData));
+        var victim = currentGame.GetPlayerById(new Guid(payloadData));
         
         if (victim == null)
         {
