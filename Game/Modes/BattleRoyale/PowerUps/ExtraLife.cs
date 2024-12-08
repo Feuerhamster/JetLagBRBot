@@ -1,24 +1,14 @@
+using JetLagBRBot.Game.Modes.BattleRoyale.Utils;
+
 namespace JetLagBRBot.Game.Modes.BattleRoyale.PowerUps;
 
-public class ExtraLifePowerup : IPowerUp
+public class ExtraLifePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId, "Extra Life")
 {
-    public EPowerUp PowerUp { get; private set; }
-    public bool IsActive { get; private set; }
+    public override void Use()
+    {
+        var p = this.Gamemode.Players.Find(p => p.Id.Equals(this.OwnerId));
+        if (p != null) p.PlayerGameStateData.HealthPoints += 1;
 
-    public ExtraLifePowerup(BattleRoyaleGamemode game, IServiceProvider services)
-    {
-        
-    }
-    
-    public Task OnActivate()
-    {
-        this.IsActive = true;
-        return Task.CompletedTask;
-    }
-
-    public Task OnDispose()
-    {
-        this.IsActive = false;
-        return Task.CompletedTask;
+        this.Expire();
     }
 }

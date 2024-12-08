@@ -1,6 +1,6 @@
 using JetLagBRBot.Game.Modes.BattleRoyale.PowerUps;
 
-namespace JetLagBRBot.Game.Modes.BattleRoyale;
+namespace JetLagBRBot.Game.Modes.BattleRoyale.Utils;
 
 public enum EPowerUp
 {
@@ -9,13 +9,13 @@ public enum EPowerUp
 
 public static class PowerUpUtils
 {
-    public static IPowerUp? GetPowerUp(EPowerUp powerUp, BattleRoyaleGamemode battleRoyale, IServiceProvider serviceProvider)
+    public static BasePowerUp? GetPowerUp(EPowerUp powerUp, BattleRoyaleGamemode battleRoyale, IServiceProvider serviceProvider)
     {
         switch (powerUp)
         {
             case EPowerUp.ExtraLife:
             {
-                return ActivatorUtilities.CreateInstance<ExtraLifePowerup>(serviceProvider);
+                return ActivatorUtilities.CreateInstance<ExtraLifePowerUp>(serviceProvider);
             }
             default:
             {
@@ -31,3 +31,4 @@ public static class PowerUpUtils
         return (EPowerUp)values.GetValue(random.Next(values.Length));
     } 
 }
+

@@ -1,3 +1,5 @@
+using JetLagBRBot.Game.Modes.BattleRoyale.Utils;
+
 namespace JetLagBRBot.Game.Modes.BattleRoyale;
 
 
@@ -15,26 +17,19 @@ public class GameStateData
     public Landmark? CurrentActiveLandmark = null;
 }
 
-public class PlayerTag(Guid taggerId, Guid victimId)
+public class PlayerTag(Guid taggerId, Guid victimId, int damage = 0)
 {
-    public Guid TagId { get; set; } = Guid.NewGuid();
+    public Guid TagId { get; private set; } = Guid.NewGuid();
     public DateTime TagTime { get; set; } = DateTime.Now;
     public Guid TaggerId { get; set; } = taggerId;
     public Guid VictimId { get; set; } = victimId;
-}
-
-public interface IPowerUp
-{
-    public EPowerUp PowerUp { get; }
-    public bool IsActive { get; }
-    public Task OnActivate();
-    public Task OnDispose();
+    public int Damage { get; set; } = damage;
 }
 
 public class PlayerOrTeamStateData
 {
     public int HealthPoints { get; set; }
-    public List<IPowerUp> Powerups { get; set; }
+    public List<BasePowerUp> Powerups { get; set; }
 }
 
 public class Landmark(double latitude, double longitude, string name, string district, string image)
@@ -54,4 +49,15 @@ public class BattleRoyaleGameData
     public List<Landmark> Landmarks { get; set; }
     public TimeSpan? TagFreeze { get; set; }
     public TimeSpan? AfterTagProtection { get; set; }
+}
+
+public class TagEventArgs(PlayerTag tag) : EventArgs
+{
+    public PlayerTag PlayerTag { get; set; } = tag;
+    public bool Cancel { get; set; } = false;
+}
+
+public class SuccessfulTagEventArgs(PlayerTag tag) : EventArgs
+{
+    public readonly PlayerTag PlayerTag = tag;
 }

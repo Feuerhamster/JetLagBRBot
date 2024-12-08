@@ -18,6 +18,10 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     private readonly ITelegramBotService _telegramBot;
     
     private readonly IServiceProvider _services;
+
+    public event EventHandler<TagEventArgs> OnPlayerTag; 
+    
+    public event EventHandler<SuccessfulTagEventArgs> OnSuccessfulPlayerTag; 
     
     public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, long telegramGroupId, IServiceProvider services) : base(template, telegramGroupId, services)
     {
@@ -85,30 +89,29 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         if (victim == null || tagger == null) return;
         
-        // check for powerups
-        /*var victimPowerup =
-            victim.PlayerGameStateData.Powerups.FirstOrDefault(p =>
-                p is { Activator: EPowerupActivator.OnTagged, IsActive: true });
+        var tag = new PlayerTag(tagger.Id, victim.Id);
         
-        var taggerPowerup =
-            tagger.PlayerGameStateData.Powerups.FirstOrDefault(p =>
-                p is { Activator: EPowerupActivator.OnTagged, IsActive: true });
+        // fire event
+        var eventArgs = new TagEventArgs(tag);
+        this.OnPlayerTag.Invoke(this, eventArgs);
 
-        if (victimPowerup != null)
+        var taggerMention = TgFormatting.UserMention(tagger.TelegramId, tagger.Nickname);
+        var victimMention = TgFormatting.UserMention(victim.TelegramId, victim.Nickname);
+        
+        if (eventArgs.Cancel)
         {
-            var cancel = await victimPowerup.Use(this, this._services);
-
-            if (cancel) return;
+            await this.BroadcastMessage(
+                $"\u274e The tag of {taggerMention} on {victimMention} was canceled due to a power up of them!");
+            return;
         }
         
-        if (taggerPowerup != null)
-        {
-            var cancel = await taggerPowerup.Use(this, this._services);
-
-            if (cancel) return;
-        }*/
+        this.OnSuccessfulPlayerTag.Invoke(this, new SuccessfulTagEventArgs(tag));
         
-        this.Game.GameStateData.PlayerTags.Add(new PlayerTag(tagger.Id, victim.Id));
+        this.Game.GameStateData.PlayerTags.Add(tag);
+
+        victim.PlayerGameStateData.HealthPoints -= tag.Damage;
+        
+        await this.BroadcastMessage($"\ud83d\udea9 Player {taggerMention} successfully tagged {victimMention}!");
     }
 
     public async Task<bool> ClaimLandmark(Guid claimerId)
