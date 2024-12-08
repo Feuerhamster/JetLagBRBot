@@ -13,11 +13,11 @@ public interface IBaseGame
     public GameTemplate GameTemplate { get; }
 }
 
-public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBaseGame
+public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame
 {
     private readonly ITelegramBotService _telegramBot; 
     
-    public Game<GameState> Game { get; private set; }
+    public Game<TGameState> Game { get; private set; }
 
     public ManagedTimer GameTimer { get; }
     
@@ -25,12 +25,12 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
 
     // protected List<Team<TeamGameState>> Teams { get; private set; } = new();
 
-    public List<Player<PlayerGameState>> Players { get; private set; } = new();
+    public List<Player<TPlayerGameState>> Players { get; private set; } = new();
     
     protected BaseGame(GameTemplate template, long telegramGroupId, IServiceProvider serviceProvider)
     {
         this._telegramBot = serviceProvider.GetService<ITelegramBotService>();
-        this.Game = new Game<GameState>(template.Config.Name, telegramGroupId);
+        this.Game = new Game<TGameState>(template.Config.Name, telegramGroupId);
         this.GameTemplate = template;
         
         this.GameTimer = new ManagedTimer(template.Config.Duration);
@@ -79,7 +79,7 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
     /// <param name="nickname"></param>
     public void PlayerJoin(long telegramId, string nickname)
     {
-        Player<PlayerGameState> p = new(nickname, telegramId);
+        Player<TPlayerGameState> p = new(nickname, telegramId);
         this.Players.Add(p);
     }
 
@@ -134,7 +134,7 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
     public void ResetGame()
     {
         this.GameTimer.Reset();
-        this.Game = new Game<GameState>(GameTemplate.Config.Name, this.Game.TelegramGroupId);
+        this.Game = new Game<TGameState>(GameTemplate.Config.Name, this.Game.TelegramGroupId);
         this.Players.Clear();
         this.BroadcastMessage("ℹ\ufe0f The game has been reset!");
     }
@@ -145,7 +145,7 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
     /// <param name="message">text message for the group</param>
     public async Task BroadcastMessage(string message, IReplyMarkup replyMarkup = null)
     {
-        this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
+        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
     }
     
     /// <summary>
@@ -159,7 +159,7 @@ public abstract class BaseGame<GameState, TeamGameState, PlayerGameState> : IBas
         await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
     }
 
-    public Player<PlayerGameState>? GetPlayerById(Guid playerId)
+    public Player<TPlayerGameState>? GetPlayerById(Guid playerId)
     {
         return this.Players.FirstOrDefault(p => p.Id.Equals(playerId));
     }

@@ -20,9 +20,9 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     
     private readonly IServiceProvider _services;
 
-    public event EventHandler<TagEventArgs> OnPlayerTag; 
+    public event EventHandler<TagEventArgs> OnPlayerTag = delegate { }; 
     
-    public event EventHandler<SuccessfulTagEventArgs> OnSuccessfulPlayerTag; 
+    public event EventHandler<SuccessfulTagEventArgs> OnSuccessfulPlayerTag = delegate { };
     
     public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, long telegramGroupId, IServiceProvider services) : base(template, telegramGroupId, services)
     {
@@ -52,6 +52,9 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         this.NewLandmark();
     }
 
+    /// <summary>
+    /// Select a new landmark (this overwrites the current one)
+    /// </summary>
     private async Task NewLandmark()
     {
         var rand = new Random();
@@ -83,6 +86,11 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         await this._telegramBot.Client.SendPhoto(this.Game.TelegramGroupId, new InputFileStream(fileStream));
     }
 
+    /// <summary>
+    /// Execute the routine for tagging a player
+    /// </summary>
+    /// <param name="taggerId">Player Id of the tagger</param>
+    /// <param name="victimId">Player Id of the victim</param>
     public async Task TagPlayer(Guid taggerId, Guid victimId)
     {
         var victim = this.GetPlayerById(victimId);
@@ -139,7 +147,37 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         claimer.PlayerGameStateData.Powerups.Add(powerUp);
         
-        this.BroadcastMessage($"\ud83c\udf1f {TgFormatting.UserMention(claimer.TelegramId, claimer.Nickname)} claimed the PowerUp at the current Landmark \"{lm.Name}\"");
+        await this.BroadcastMessage($"\ud83c\udf1f {TgFormatting.UserMention(claimer.TelegramId, claimer.Nickname)} claimed the PowerUp at the current Landmark \"{lm.Name}\"");
+        return true;
+    }
+
+    /// <summary>
+    /// Activate a PowerUp for a Player. If the player already has one active, the active one expires immediately in favor of the new one
+    /// </summary>
+    /// <param name="playerId">Id of the player</param>
+    /// <param name="powerUpId">Id of the power up</param>
+    /// <returns>true if usage was successful, false if it was not used successfully</returns>
+    public async Task<bool> UsePowerUp(Guid playerId, Guid powerUpId)
+    {
+        var player = this.GetPlayerById(playerId);
+
+        if (player == null) return false;
+        
+        // check if player has already active powerup
+        var activePowerUps = player.PlayerGameStateData.Powerups.Where(p => p.Status == EPowerUpStatus.Active).ToList();
+
+        // expire the active power up because the player can have only one power up usage at a time
+        foreach (var activePowerUp in activePowerUps)
+        {
+            activePowerUp.Expire();
+        }
+        
+        var powerUp = player.PlayerGameStateData.Powerups.FirstOrDefault(p => p.Id.Equals(powerUpId));
+        
+        if (powerUp == null) return false;
+        
+        powerUp.Use();
+        
         return true;
     }
 }

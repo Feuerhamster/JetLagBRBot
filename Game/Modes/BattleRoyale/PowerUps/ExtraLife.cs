@@ -9,6 +9,10 @@ public class ExtraLifePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId) : Bas
 
     public override void Use()
     {
+        if (this.Status != EPowerUpStatus.Inactive) return;
+        
+        this.Status = EPowerUpStatus.Active;
+        
         var p = this.Gamemode.Players.Find(p => p.Id.Equals(this.OwnerId));
         if (p != null) p.PlayerGameStateData.HealthPoints += 1;
 

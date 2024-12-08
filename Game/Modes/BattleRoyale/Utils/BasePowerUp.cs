@@ -13,7 +13,7 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
     
-    public EPowerUpStatus Status { get; private set; } = EPowerUpStatus.Inactive;
+    public EPowerUpStatus Status { get; protected set; } = EPowerUpStatus.Inactive;
     
     protected readonly BattleRoyaleGamemode Gamemode = gamemode;
     protected readonly Guid OwnerId = ownerId;
