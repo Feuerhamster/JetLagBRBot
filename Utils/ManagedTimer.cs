@@ -12,7 +12,7 @@ public class ManagedTimer
     
     private readonly System.Timers.Timer _timer;
 
-    public TimeSpan Duration { get; private set; }
+    public TimeSpan Duration { get; set; }
     public DateTime TimeStarted { get; private set; }
     
     public ManagedTimer(TimeSpan duration, int tickDuration = 20000)
