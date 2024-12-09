@@ -1,0 +1,202 @@
+[
+  {
+    "District": "Altstadt",
+    "Name": "Globus-Brunnen",
+    "Address": "",
+    "Coordinates": [
+      53546979,
+      9991107
+    ],
+    "ImagePath": "images/globus-brunnen.jpeg"
+  },
+  {
+    "District": "Altstadt",
+    "Name": "Heinrich-Heine-Denkmal",
+    "Address": "Rathausmarkt, 20095 Hamburg",
+    "Coordinates": [
+      535504612,
+      99936483
+    ],
+    "ImagePath": "images/heinrich-heine-denkmal.jpg"
+  },
+  {
+    "District": "Altstadt",
+    "Name": "Hygieia-Brunnen",
+    "Address": "",
+    "Coordinates": [
+      53550243,
+      9992051
+    ],
+    "ImagePath": "images/hygieia-brunnen.jpg"
+  },
+  {
+    "District": "Altstadt",
+    "Name": "Johann-Georg-M\u00F6nckeberg-Denkmal",
+    "Address": "Altstadt, 20095 Hamburg",
+    "Coordinates": [
+      535512417,
+      100008004
+    ],
+    "ImagePath": "images/johann-georg-moenckeberg-denkmal.jpg"
+  },
+  {
+    "District": "Altstadt",
+    "Name": "Neuer Kran",
+    "Address": "b. dem Neuen Krahn 2, 20457 Hamburg",
+    "Coordinates": [
+      535447104,
+      99885155
+    ],
+    "ImagePath": "images/neuer-kran.jpg"
+  },
+  {
+    "District": "Altstadt",
+    "Name": "Rette den Wald",
+    "Address": "",
+    "Coordinates": [
+      53549847,
+      9997084
+    ],
+    "ImagePath": "images/rette-den-wald.jpg"
+  },
+  {
+    "District": "Altstadt",
+    "Name": "Skulptur von Jens-Flemming S\u00F8rensen (1993)",
+    "Address": "Klingberg, 20457 Hamburg",
+    "Coordinates": [
+      53547897,
+      100006046
+    ],
+    "ImagePath": "images/skulptur-von-jens-flemming-sorensen.jpg"
+  },
+  {
+    "District": "Neustadt",
+    "Name": "Bismarck-Denkmal",
+    "Address": "",
+    "Coordinates": [
+      53548709,
+      9972092
+    ],
+    "ImagePath": "images/bismarck-denkmal.jpg"
+  },
+  {
+    "District": "Neustadt",
+    "Name": "Cap San Diego (Steg)",
+    "Address": "",
+    "Coordinates": [
+      53543001,
+      9976752
+    ],
+    "ImagePath": "images/cap-san-diego.jpg"
+  },
+  {
+    "District": "Neustadt",
+    "Name": "Hummel-Denkmal",
+    "Address": "",
+    "Coordinates": [
+      53552232,
+      9981852
+    ],
+    "ImagePath": "images/hummel-denkmal.jpg"
+  },
+  {
+    "District": "Neustadt",
+    "Name": "Lessing-Denkmal",
+    "Address": "",
+    "Coordinates": [
+      53555161,
+      9988517
+    ],
+    "ImagePath": "images/lessing-denkmal.jpg"
+  },
+  {
+    "District": "Neustadt",
+    "Name": "Morgenstunde",
+    "Address": "",
+    "Coordinates": [
+      5355049,
+      9978368
+    ],
+    "ImagePath": "images/morgenstunde.jpg"
+  },
+  {
+    "District": "Neustadt",
+    "Name": "Die Windsbraut",
+    "Address": "",
+    "Coordinates": [
+      53557075,
+      999375
+    ],
+    "ImagePath": "images/die-windsbraut.jpg"
+  },
+  {
+    "District": "Neustadt",
+    "Name": "Wand-Lung",
+    "Address": "St Pauli, 20355 Hamburg",
+    "Coordinates": [
+      535575662,
+      99804615
+    ],
+    "ImagePath": "images/wand-lung.jpg"
+  },
+  {
+    "District": "Neustadt",
+    "Name": "Skulptur Liegende",
+    "Address": "",
+    "Coordinates": [
+      535584718,
+      99886671
+    ],
+    "ImagePath": "images/skulptur-liegende.jpg"
+  },
+  {
+    "District": "St. Pauli",
+    "Name": "Sonnenuhr (Planten un Blomen)",
+    "Address": "",
+    "Coordinates": [
+      53562572,
+      9979952
+    ],
+    "ImagePath": "images/sonnenuhr-planten-un-blomen.jpg"
+  },
+  {
+    "District": "St. Pauli",
+    "Name": "PENNY-Markt auf der Reeperbahn",
+    "Address": "",
+    "Coordinates": [
+      53549752,
+      9960497
+    ],
+    "ImagePath": "images/penny-markt-auf-der-reeperbahn.jpg"
+  },
+  {
+    "District": "St. Pauli",
+    "Name": "St.Pauli Logo-Statue",
+    "Address": "",
+    "Coordinates": [
+      53553362,
+      9966276
+    ],
+    "ImagePath": "images/st-pauli-logo-statue.JPG"
+  },
+  {
+    "District": "St. Pauli",
+    "Name": "Skulptur Kaiser Wilhelm I.",
+    "Address": "Johannes-Brahms-Platz, 20355 Hamburg",
+    "Coordinates": [
+      535553782,
+      99780988
+    ],
+    "ImagePath": "images/skulptur-kaiser-wilhelm-i.jpg"
+  },
+  {
+    "District": "St. Pauli",
+    "Name": "Japanischer Garten (Japanisches Teehaus)",
+    "Address": "Marseiller Str. 7, 20355 Hamburg",
+    "Coordinates": [
+      535606872,
+      99833942
+    ],
+    "ImagePath": "images/japanischer-garten-japanisches-teehaus.jpg"
+  }
+]
