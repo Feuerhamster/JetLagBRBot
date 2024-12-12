@@ -1,3 +1,4 @@
+using JetLagBRBot.Utils;
 using LiteDB;
 using Telegram.Bot.Types;
 
@@ -54,6 +55,8 @@ public class Player<TPlayerGameState>(string nickname, long tgId)
     public string Nickname { get; set; } = nickname;
     
     public Location? Location { get; set; }
+
+    public string TelegramMention => TgFormatting.UserMention(TelegramId, Nickname);
 
     public TPlayerGameState PlayerGameStateData { get; set; }
 }

@@ -60,7 +60,7 @@ public static class PowerUpUtils
             }
             case EPowerUp.InstantHit:
             {
-                return new ExtraLife(battleRoyale, ownerId);
+                return new InstantHit(battleRoyale, ownerId);
             }
             case EPowerUp.Vampirism:
             {
@@ -72,7 +72,7 @@ public static class PowerUpUtils
             }
             case EPowerUp.Stealing:
             {
-                return new ExtraLife(battleRoyale, ownerId);
+                return new Stealing(battleRoyale, ownerId);
             }
             case EPowerUp.Clairvoyance:
             {

@@ -28,20 +28,15 @@ public class Stop(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gam
 
         if (this.Target == null) return;
         
-        var targetMention = TgFormatting.UserMention(this.Target.TelegramId, this.Target.Nickname);
-        
         var player = this.Gamemode.GetPlayerById(this.OwnerId);
-        var mention = TgFormatting.UserMention(player.TelegramId, player.Nickname);
 
-        this.Gamemode.BroadcastMessage($"\u26d4 {mention} has used the \"Stop\" power up on {targetMention}!\n{targetMention} has to stop now for {this.TimerDurationMinutes}");
-        this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {mention} has used the \"\" power up on you. You have to stop now for {this.TimerDurationMinutes} minutes. If you are in public transport right now, exit on the next possible opportunty and stay there.");
+        this.Gamemode.BroadcastMessage($"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on {this.Target.TelegramMention}!\n{this.Target.TelegramMention} has to stop now for {this.TimerDurationMinutes}");
+        this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {player.TelegramMention} has used the \"\" power up on you. You have to stop now for {this.TimerDurationMinutes} minutes. If you are in public transport right now, exit on the next possible opportunty and stay there.");
     }
 
     protected override void OnTimerFinished(object? sender, EventArgs e)
     {
-        var targetMention = TgFormatting.UserMention(this.Target.TelegramId, this.Target.Nickname);
-
-        this.Gamemode.BroadcastMessage($"\u2705 {targetMention} is free to move again!");
+        this.Gamemode.BroadcastMessage($"\u2705 {this.Target.TelegramMention} is free to move again!");
         this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u2705 You are now allowed to move again!");
         
         base.Expire();
