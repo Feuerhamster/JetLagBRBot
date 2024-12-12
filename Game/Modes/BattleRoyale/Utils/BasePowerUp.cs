@@ -10,6 +10,12 @@ public enum EPowerUpStatus
     Expired
 }
 
+public enum EPowerUpInput
+{
+    None,
+    PlayerId
+}
+
 /// <summary>
 /// A class that implements base power up functionality
 /// </summary>
@@ -24,17 +30,19 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
     protected readonly BattleRoyaleGamemode Gamemode = gamemode;
     protected readonly Guid OwnerId = ownerId;
     
-    protected abstract string Name { get; }
-    protected abstract string Description { get; }
+    public abstract string Name { get; }
+    public abstract string Description { get; }
     
     /// <summary>
     /// If this is not null, the powerup will have a timer that automatically starts when base Use() method is called and expires the power up automatically after it finished
     /// </summary>
     protected virtual int? TimerDurationMinutes { get; } = null;
+    
+    public virtual EPowerUpInput Input { get; } = EPowerUpInput.None;
 
     protected ManagedTimer Timer { get; private set; } = new(new TimeSpan(0,0, 0));
     
-    public virtual void Use()
+    public virtual void Use(string? input = null)
     {
         this.Status = EPowerUpStatus.Active;
 

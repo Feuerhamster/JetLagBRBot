@@ -3,16 +3,16 @@ using JetLagBRBot.Game.Modes.BattleRoyale.Utils;
 
 namespace JetLagBRBot.Game.Modes.BattleRoyale.PowerUps;
 
-public class VampirismPowerUp(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
+public class Vampirism(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
 {
-    protected override string Name { get; } = "Vampirism";
+    public override string Name { get; } = "Vampirism";
 
-    protected override string Description { get; } =
+    public override string Description { get; } =
         "If you successfully tag someone, you will get +1 extra HP.";
     
     private Guid currentTag = Guid.Empty;
     
-    public override void Use()
+    public override void Use(string? input)
     {
         base.Use();
         

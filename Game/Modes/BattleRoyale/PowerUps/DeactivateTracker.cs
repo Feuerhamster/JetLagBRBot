@@ -5,14 +5,14 @@ namespace JetLagBRBot.Game.Modes.BattleRoyale.PowerUps;
 
 public class DeactivateTracker(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
 {
-    protected override string Name { get; } = "Deactivate Tracker";
+    public override string Name { get; } = "Deactivate Tracker";
 
-    protected override string Description { get; } =
+    public override string Description { get; } =
         $"You are allowed to deactivate your live location sharing for 15 minutes.";
 
     protected override int? TimerDurationMinutes { get; } = 15;
 
-    public override void Use()
+    public override void Use(string? input)
     {
         base.Use();
 

@@ -61,3 +61,11 @@ public class SuccessfulTagEventArgs(PlayerTag tag) : EventArgs
 {
     public readonly PlayerTag PlayerTag = tag;
 }
+
+public class PowerUpUseEventArgs(BasePowerUp powerUp, Guid playerId) : EventArgs
+{
+    public BasePowerUp PowerUp { get; private set; } = powerUp;
+    
+    public Guid PlayerId { get; set; } = playerId;
+    public bool Cancel { get; set; } = false;
+}

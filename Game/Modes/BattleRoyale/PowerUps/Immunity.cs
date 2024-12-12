@@ -3,17 +3,17 @@ using JetLagBRBot.Game.Modes.BattleRoyale.Utils;
 
 namespace JetLagBRBot.Game.Modes.BattleRoyale.PowerUps;
 
-public class ImmunityPowerUp(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
+public class Immunity(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
 {
     protected override int? TimerDurationMinutes { get; } = 5;
 
-    protected override string Name { get; } = "Immunity";
+    public override string Name { get; } = "Immunity";
 
-    protected override string Description { get; } =
+    public override string Description { get; } =
         "You cannot be tagged for 5 minutes. You can still get targeted by other power ups.";
     
     
-    public override void Use()
+    public override void Use(string? input)
     {
         base.Use();
         

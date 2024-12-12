@@ -2,12 +2,12 @@ using JetLagBRBot.Game.Modes.BattleRoyale.Utils;
 
 namespace JetLagBRBot.Game.Modes.BattleRoyale.PowerUps;
 
-public class ExtraLifePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
+public class ExtraLife(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
 {
-    protected override string Name { get; } = "Extra Life";
-    protected override string Description { get; } = "Instantly adds an extra life to your health points.";
+    public override string Name { get; } = "Extra Life";
+    public override string Description { get; } = "Instantly adds an extra life to your health points.";
 
-    public override void Use()
+    public override void Use(string? input)
     {
         base.Use();
         

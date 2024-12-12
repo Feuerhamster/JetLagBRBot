@@ -3,16 +3,16 @@ using JetLagBRBot.Game.Modes.BattleRoyale.Utils;
 
 namespace JetLagBRBot.Game.Modes.BattleRoyale.PowerUps;
 
-public class DoubleDamagePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
+public class DoubleDamage(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gamemode, ownerId)
 {
-    protected override string Name { get; } = "Double Damage";
+    public override string Name { get; } = "Double Damage";
 
-    protected override string Description { get; } =
+    public override string Description { get; } =
         "The next player you successfully tag gets double the damage of a regular tag.";
     
     private Guid currentTag = Guid.Empty;
     
-    public override void Use()
+    public override void Use(string? input)
     {
         base.Use();
         

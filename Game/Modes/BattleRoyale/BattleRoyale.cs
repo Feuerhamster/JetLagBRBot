@@ -24,6 +24,10 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     
     public event EventHandler<SuccessfulTagEventArgs> OnSuccessfulPlayerTag = delegate { };
     
+    public event EventHandler<PowerUpUseEventArgs> OnPowerUpUse = delegate { };
+    
+    public event EventHandler<Guid> OnSuccessfulPowerUpUse = delegate { };
+    
     public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, long telegramGroupId, IServiceProvider services) : base(template, telegramGroupId, services)
     {
         this.TimeBetweenDrops = data.TimeBetweenDrops;
@@ -92,6 +96,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     /// <param name="taggerId">Player Id of the tagger</param>
     /// <param name="victimId">Player Id of the victim</param>
     public async Task TagPlayer(Guid taggerId, Guid victimId)
+    
     {
         var victim = this.GetPlayerById(victimId);
         var tagger = this.GetPlayerById(taggerId);
@@ -143,7 +148,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         // TODO: implement actual powerup claim
         var randomPowerUp = PowerUpUtils.RandomPowerUp();
-        var powerUp = PowerUpUtils.GetPowerUp(randomPowerUp, this, claimer.Id);
+        var powerUp = PowerUpUtils.GetPowerUpInstance(randomPowerUp, this, claimer.Id);
         
         claimer.PlayerGameStateData.Powerups.Add(powerUp);
         
@@ -175,8 +180,16 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         var powerUp = player.PlayerGameStateData.Powerups.FirstOrDefault(p => p.Id.Equals(powerUpId));
         
         if (powerUp == null) return false;
+
+        var eventArgs = new PowerUpUseEventArgs(powerUp, playerId);
+        
+        OnPowerUpUse.Invoke(this, eventArgs);
+
+        if (eventArgs.Cancel) return false;
         
         powerUp.Use();
+        
+        OnSuccessfulPowerUpUse.Invoke(this, powerUp.Id);
         
         return true;
     }
