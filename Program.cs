@@ -15,6 +15,7 @@ builder.Services.AddSingleton<IGameTemplateService, GameTemplateService>();
 builder.Services.AddSingleton<IGameLogService, GameLogService>();
 builder.Services.AddSingleton<IGameManagerService, GameManagerService>();
 builder.Services.AddSingleton<ICommandService, CommandService>();
+builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
 
 var app = builder.Build();
 
@@ -33,6 +34,8 @@ IGameManagerService gameManagerService = app.Services.GetService<IGameManagerSer
 
 gameManagerService.LoadCommands();
 
+
+app.Services.GetService<IDatabaseService>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

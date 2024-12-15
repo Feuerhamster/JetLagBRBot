@@ -17,7 +17,7 @@ public class GameStateData
     public Landmark? CurrentActiveLandmark = null;
 }
 
-public class PlayerTag(Guid taggerId, Guid victimId, int damage = 0)
+public class PlayerTag(Guid taggerId, Guid victimId, int damage = 1)
 {
     public Guid TagId { get; private set; } = Guid.NewGuid();
     public DateTime TagTime { get; set; } = DateTime.Now;
@@ -34,7 +34,7 @@ public class PlayerOrTeamStateData
 
 public class Landmark
 {
-    public Guid Id { get; set; } = new Guid();
+    public Guid Id { get; set; } = Guid.NewGuid();
     public float[] Coordinates { get; set; }
     public string Name { get; set; }
     public string District { get; set; }

@@ -11,6 +11,13 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
 {
     public override string Command { get; } = "tag";
     public override string Description { get; } = "Tags a player";
+
+    public override ICustomBotCommandConstraint[] Constraints { get; } =
+    [
+        new OnlyPlayersWhoJoinedConstraint(),
+        new OnlyGameModeConstraint(BattleRoyaleGamemode.GameModeName)
+    ];
+
     public async override Task Execute(Message msg, UpdateType type)
     {
         var currentGame =
@@ -23,14 +30,6 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
         
         var keyboard = new InlineKeyboardChoiceFactory(this.Command);
         
-        var playerInGame = currentGame.Players.Exists(p => p.TelegramId == msg.From.Id);
-
-        if (!playerInGame)
-        {
-            bot.Client.SendMessage(msg.Chat.Id, "You are not in a game");
-            return;
-        }
-        
         foreach (var player in currentGame.Players)
         {
             keyboard.AddChoice(player.Nickname, player.Id.ToString());
@@ -38,8 +37,9 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
         
         bot.Client.SendMessage(
             msg.Chat.Id,
-            "Please select the player you wanna tag.\n**You have to post a photo of them on which they can be identified into the game chat group!**",
-            replyMarkup: keyboard.GetKeyboardMarkup()
+            @"Please select the player you wanna tag\.\n**You have to post a photo of them on which they can be identified into the game chat group\!**",
+            replyMarkup: keyboard.GetKeyboardMarkup(),
+            parseMode: ParseMode.MarkdownV2
         );
     }
     

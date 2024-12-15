@@ -18,12 +18,13 @@ public class Clairvoyance(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
         base.Use();
         
         this.Gamemode.OnPowerUpUse += this.OnPowerUpUse;
+        this.Gamemode.OnLandmarkClaim += this.OnLandmarkClaim;
         
         this.Gamemode.SendPlayerMessage(this.OwnerId,
             $"\ud83c\udf1f Your {this.Name} PowerUp is now active for {this.TimerDurationMinutes} minutes!");
 
         var text = new StringBuilder();
-        text.AppendLine("**Here are the power up inventories of all players:**\n");
+        text.AppendLine("Here are the power up inventories of all players:\n");
         
         foreach (var player in this.Gamemode.Players)
         {
@@ -36,11 +37,14 @@ public class Clairvoyance(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
 
             text.AppendLine();
         }
+        
+        this.Gamemode.SendPlayerMessage(this.OwnerId, text.ToString());
     }
 
     protected override void OnTimerFinished(object? sender, EventArgs e)
     {
         this.Gamemode.OnPowerUpUse -= this.OnPowerUpUse;
+        this.Gamemode.OnLandmarkClaim -= this.OnLandmarkClaim;
         this.Expire();
     }
 
@@ -50,6 +54,15 @@ public class Clairvoyance(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
 
         var p = this.Gamemode.Players.FirstOrDefault(p => p.Id.Equals(e.PlayerId));
         
-        this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83d\udd2e {p.Nickname} use the {e.PowerUp.Name}");
+        this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83d\udd2e {p.Nickname} use the {e.PowerUp.Name} power up");
+    }
+    
+    private void OnLandmarkClaim(object? sender, PowerUpUseEventArgs e)
+    {
+        if (this.Status != EPowerUpStatus.Active) return;
+
+        var p = this.Gamemode.Players.FirstOrDefault(p => p.Id.Equals(e.PlayerId));
+        
+        this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83d\udd2e {p.Nickname} claimed the {e.PowerUp.Name} power up");
     }
 }

@@ -20,12 +20,16 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     private readonly ITelegramBotService _telegramBot;
     
     private readonly IServiceProvider _services;
+    
+    private readonly IDatabaseService _database;
 
     public event EventHandler<TagEventArgs> OnPlayerTag = delegate { }; 
     
     public event EventHandler<SuccessfulTagEventArgs> OnSuccessfulPlayerTag = delegate { };
     
     public event EventHandler<PowerUpUseEventArgs> OnPowerUpUse = delegate { };
+
+    public event EventHandler<PowerUpUseEventArgs> OnLandmarkClaim = delegate { }; 
     
     public event EventHandler<Guid> OnSuccessfulPowerUpUse = delegate { };
     
@@ -33,6 +37,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     {
         this.TimeBetweenDrops = data.TimeBetweenDrops;
         this._services = services;
+        this._database = services.GetRequiredService<IDatabaseService>();
         
         this.Game.GameStateData.Landmarks = new(data.Landmarks);
         
@@ -42,6 +47,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         commandService.AddCommand<TagCommand>();
         commandService.AddCommand<ClaimCommand>();
         commandService.AddCommand<InvCommand>();
+        commandService.AddCommand<UseCommand>();
         this._telegramBot.UpdateCommands();
         
         this.GameTimer.OnTick += this.Tick;
@@ -78,7 +84,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         // select new drop
         var newLandmark = this.Game.GameStateData.Landmarks
-            //.Where(l => l.District != this.Game.GameStateData.CurrentActiveLandmark.District)
+            .Where(l => (this.Game.GameStateData.CurrentActiveLandmark == null || l.District != this.Game.GameStateData.CurrentActiveLandmark.District) || this.Game.GameStateData.Landmarks.All(c => c.District == l.District))
             .OrderBy(l => rand.Next())
             .FirstOrDefault();
 
@@ -104,9 +110,25 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         await this.BroadcastMessage(message.ToString());
 
-        var imagePath = Path.Combine(this.GameTemplate.FilePath, newLandmark.ImagePath);
-        var fileStream = System.IO.File.OpenRead(imagePath);
-        await this._telegramBot.Client.SendPhoto(this.Game.TelegramGroupId, new InputFileStream(fileStream));
+        var fileName = Path.GetFileName(newLandmark.ImagePath);
+
+        var cachedImg = this._database.GetImageCache(fileName);
+
+        if (cachedImg == null)
+        {
+            var imagePath = Path.Combine(this.GameTemplate.FilePath, newLandmark.ImagePath);
+            var fileStream = System.IO.File.OpenRead(imagePath);
+            
+            var msg = await this._telegramBot.Client.SendPhoto(this.Game.TelegramGroupId, new InputFileStream(fileStream));
+
+            var photoId = msg.Photo.Last().FileId;
+            
+            this._database.InsertImageCache(new ImageCache() { FileName = fileName, TgFileId = photoId});
+        }
+        else
+        {
+            await this._telegramBot.Client.SendPhoto(this.Game.TelegramGroupId, cachedImg.TgFileId);
+        }
     }
 
     /// <summary>
@@ -152,6 +174,29 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     }
 
     /// <summary>
+    /// Revert a tag
+    /// </summary>
+    /// <param name="TagId">Id of the tag</param>
+    /// <returns>successful</returns>
+    public async Task<bool> UndoTag(Guid TagId)
+    {
+        var tag = this.Game.GameStateData.PlayerTags.FirstOrDefault(pt => pt.TagId.Equals(TagId));
+        
+        if (tag == null) return false;
+        
+        var tagger = this.GetPlayerById(tag.TaggerId);
+        var victim = this.GetPlayerById(tag.VictimId);
+        
+        if (tagger == null || victim == null) return false;
+        
+        victim.PlayerGameStateData.HealthPoints += tag.Damage;
+        
+        this.Game.GameStateData.PlayerTags.Remove(tag);
+
+        return true;
+    }
+
+    /// <summary>
     /// Claim a landmark
     /// </summary>
     /// <param name="claimerId">Player id of the player who claims the landmark</param>
@@ -176,10 +221,32 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         claimer.PlayerGameStateData.Powerups.Add(powerUp);
         
+        lm.Claimed = true;
+        
         await this.BroadcastMessage($"\ud83c\udf1f {claimer.TelegramMention} claimed the PowerUp at the current Landmark \"{lm.Name}\"");
 
         await this.SendPlayerMessage(claimerId, $"\ud83c\udf1f You have sucessfully claimed the Landmark \"{lm.Name}\" obtained the \"{powerUp.Name}\" power up");
         
+        this.OnLandmarkClaim.Invoke(this, new PowerUpUseEventArgs(powerUp, claimer.Id));
+        
+        return true;
+    }
+
+    /// <summary>
+    /// Give a specific power up to a specific player
+    /// </summary>
+    /// <param name="playerId"></param>
+    /// <param name="desiredPowerUp"></param>
+    /// <returns>success</returns>
+    public bool GivePlayerPowerUp(Guid playerId, EPowerUp desiredPowerUp)
+    {
+        var claimer = this.GetPlayerById(playerId);
+        
+        if (claimer == null) return false;
+        
+        var powerUp = PowerUpUtils.GetPowerUpInstance(desiredPowerUp, this, claimer.Id);
+        claimer.PlayerGameStateData.Powerups.Add(powerUp);
+
         return true;
     }
 
@@ -189,7 +256,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     /// <param name="playerId">Id of the player</param>
     /// <param name="powerUpId">Id of the power up</param>
     /// <returns>true if usage was successful, false if it was not used successfully</returns>
-    public async Task<bool> UsePowerUp(Guid playerId, Guid powerUpId)
+    public async Task<bool> UsePowerUp(Guid playerId, Guid powerUpId, string? input = null)
     {
         if (this.Game.Status != EGameStatus.Running) return false;
         
@@ -216,7 +283,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         if (eventArgs.Cancel) return false;
         
-        powerUp.Use();
+        powerUp.Use(input);
         
         OnSuccessfulPowerUpUse.Invoke(this, powerUp.Id);
         
@@ -236,7 +303,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         if (aliveCount <= 1)
         {
-            this.FinishGame();
+            //this.FinishGame();
         }
     }
 

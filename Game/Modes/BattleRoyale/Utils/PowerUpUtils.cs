@@ -21,16 +21,16 @@ public enum EPowerUp
 public static class PowerUpUtils
 {
     private static WeightedItem<EPowerUp>[] WeightedPowerUps = [
-        new(EPowerUp.Immunity, 1),
+        /*new(EPowerUp.Immunity, 1),
         new(EPowerUp.DeactivateTracker, 2),
         new(EPowerUp.PowerUpLock, 1),
         new(EPowerUp.Stop, 2),
-        new(EPowerUp.DoubleDamage, 1),
+        new(EPowerUp.DoubleDamage, 1),*/
         new(EPowerUp.InstantHit, 1),
-        new(EPowerUp.Vampirism, 2),
+       /* new(EPowerUp.Vampirism, 2),
         new(EPowerUp.ExtraLife, 1),
         new(EPowerUp.Stealing, 2),
-        new(EPowerUp.Clairvoyance, 2),
+        new(EPowerUp.Clairvoyance, 2),*/
     ];
 
     

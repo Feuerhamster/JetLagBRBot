@@ -16,6 +16,7 @@ public interface IBaseGame
     public void StopGame();
     public void ResetGame();
     public void StartGame();
+    public bool HasPlayer(long telegramId);
 }
 
 public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame where TGameState : class, new() where TPlayerGameState : class, new()
@@ -75,6 +76,11 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     {
         this.Game.Status = EGameStatus.Finished;
         this.BroadcastMessage("\ud83c\udfc1 The game has finished!");
+    }
+
+    public bool HasPlayer(long telegramId)
+    {
+        return this.Players.Exists(p => p.TelegramId == telegramId);
     }
     
     /// <summary>
@@ -160,8 +166,8 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     /// <param name="message">text message for the group</param>
     public async Task BroadcastMessage(string message, IReplyMarkup replyMarkup = null)
     {
-        message = message.Replace("!", @"\!");
-        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.None);
+        message = TgFormatting.MarkdownEscape(message);
+        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
     }
     
     /// <summary>
@@ -172,7 +178,8 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     {
         var p = this.GetPlayerById(playerId);
         
-        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.None);
+        message = TgFormatting.MarkdownEscape(message);
+        await this._telegramBot.Client.SendMessage(p.TelegramId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
     }
 
     public Player<TPlayerGameState>? GetPlayerById(Guid playerId)

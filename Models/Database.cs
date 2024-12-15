@@ -19,3 +19,10 @@ public class DatabaseGameLog
     
     public string Message { get; set; }
 }
+
+public class ImageCache
+{
+    public string FileName { get; set; }
+
+    public string TgFileId { get; set; }
+}

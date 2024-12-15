@@ -11,17 +11,14 @@ public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManag
 {
     public override string Command { get; } = "claim";
     public override string Description { get; } = "Claim the current landmark and get the power up";
+    public override ICustomBotCommandConstraint[] Constraints { get; } =
+    [
+        new OnlyPlayersWhoJoinedConstraint(),
+        new OnlyGameModeConstraint(BattleRoyaleGamemode.GameModeName)
+    ];
+    
     public async override Task Execute(Message msg, UpdateType type)
     {
-        var currentGame =
-            gameManagerService.GetCurrentGame<BattleRoyaleGamemode>(BattleRoyaleGamemode.GameModeName);
-
-        if (currentGame == null)
-        {
-            await bot.Client.SendMessage(msg.Chat.Id, "\u26a0\ufe0f Invalid Command: Gamemode not found");
-            return;
-        }
-        
         var keyboard = new InlineKeyboardChoiceFactory(this.Command);
         
         keyboard.AddChoice("Yes", bool.TrueString);
@@ -47,7 +44,11 @@ public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManag
 
         var p = currentGame.Players.FirstOrDefault(p => p.TelegramId == update.CallbackQuery.From.Id);
 
-        if (p == null) return;
+        if (p == null)
+        {
+            await bot.Client.DeleteMessage(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.Id);
+            return;
+        }
         
         var res = await currentGame.ClaimLandmark(p.Id);
 
@@ -55,5 +56,7 @@ public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManag
         {
             await currentGame.SendPlayerMessage(p.Id, "\u26a0\ufe0f Failed to claim the landmark. Maybe it is already claimed?");
         }
+        
+        await bot.Client.DeleteMessage(update.CallbackQuery.Message.Chat.Id, update.CallbackQuery.Message.Id);
     }
 }

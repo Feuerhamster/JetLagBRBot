@@ -1,3 +1,4 @@
+using JetLagBRBot.Game;
 using JetLagBRBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -54,6 +55,43 @@ public class OnlyGroupAdminConstraint : ICustomBotCommandConstraint
         }
 
         return true;
+    }
+}
+
+public class OnlyPlayersWhoJoinedConstraint : ICustomBotCommandConstraint
+{
+    public async Task<bool> Execute(IServiceProvider serviceProvider, Message msg)
+    {
+        var botService = serviceProvider.GetService<ITelegramBotService>();
+
+        var game = serviceProvider.GetRequiredService<IGameManagerService>().GetCurrentGame<IBaseGame>(null);
+
+        if (game != null && !game.HasPlayer(msg.From.Id))
+        {
+            await botService.Client.SendMessage(
+                msg.Chat.Id,
+                "You are not in the current game"
+            );
+            return false;
+        }
+
+        return true;
+    }
+}
+
+public class OnlyGameModeConstraint(string gameMode) : ICustomBotCommandConstraint
+{
+    public async Task<bool> Execute(IServiceProvider serviceProvider, Message msg)
+    {
+        try
+        {
+            var game = serviceProvider.GetRequiredService<IGameManagerService>().GetCurrentGame<IBaseGame>(gameMode);
+            return game != null;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 }
 

@@ -15,7 +15,7 @@ public enum EGameStatus
 
 public class Game<TGameState>(string name, long telegramGroupId) where TGameState : class, new()
 {
-    [BsonId] public Guid Id { get; set; } = new Guid();
+    [BsonId] public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Name { get; set; } = name;
     
@@ -28,7 +28,7 @@ public class Game<TGameState>(string name, long telegramGroupId) where TGameStat
 
 public class Team<TTeamGameState>(string name)
 {
-    public Guid Id { get; set; } = new Guid();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Name { get; set; } = name;
     
@@ -48,7 +48,7 @@ public class Team<TTeamGameState>(string name)
 public class Player<TPlayerGameState>(string nickname, long tgId) where TPlayerGameState : class, new()
 {
     [BsonId]
-    public Guid Id { get; set; } = new Guid();
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public long TelegramId { get; set; } = tgId;
 

@@ -28,6 +28,7 @@ public class GameManagerService(ICommandService commandService, ITelegramBotServ
         commandService.AddCommand<GameStartCommand>();
         commandService.AddCommand<StopCommand>();
         commandService.AddCommand<ResetCommand>();
+        commandService.AddCommand<StartCommand>();
         telegramBotService.UpdateCommands();
     }
 
