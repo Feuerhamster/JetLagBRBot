@@ -11,22 +11,16 @@ public interface IGameManagerService
 {
     public void InitNewGame(Guid templateId, long tgGroupId);
 
-    public G? GetCurrentGame<G>(string gameMode) where G : class;
+    public G? GetCurrentGame<G>(string? gameMode) where G : class;
+    public void LoadCommands();
 }
 
-public class GameManagerService : IGameManagerService
+public class GameManagerService(ICommandService commandService, ITelegramBotService telegramBotService, IGameTemplateService gameTemplateService, IServiceProvider serviceProvider) : IGameManagerService
 {
-    private IBaseGame CurrentGame { get; set; }
-    
-    private readonly IGameTemplateService _gameTemplateService;
-    
-    private readonly IServiceProvider _serviceProvider;
-    
-    public GameManagerService(ICommandService commandService, ITelegramBotService telegramBotService, IGameTemplateService gameTemplateService, IServiceProvider serviceProvider)
+    private IBaseGame? CurrentGame { get; set; }
+
+    public void LoadCommands()
     {
-        this._gameTemplateService = gameTemplateService;
-        this._serviceProvider = serviceProvider;
-        
         commandService.AddCommand<NewGameCommand>();
         commandService.AddCommand<ReloadTemplatesCommand>();
         commandService.AddCommand<JoinCommandBase>();
@@ -39,14 +33,14 @@ public class GameManagerService : IGameManagerService
 
     public void InitNewGame(Guid templateId, long tgGroupId)
     {
-        var template = this._gameTemplateService.GetGameTemplate(templateId);
+        var template = gameTemplateService.GetGameTemplate(templateId);
 
         switch (template.Config.GameMode)
         {
             case BattleRoyaleGamemode.GameModeName:
             {
-                var data = this._gameTemplateService.LoadGameData<BattleRoyaleGameData>(templateId);
-                this.CurrentGame = new BattleRoyaleGamemode(template, data, tgGroupId, this._serviceProvider);
+                var data = gameTemplateService.LoadGameData<BattleRoyaleGameData>(templateId);
+                this.CurrentGame = new BattleRoyaleGamemode(template, data, tgGroupId, serviceProvider);
                 break;
             }
         }
@@ -54,11 +48,16 @@ public class GameManagerService : IGameManagerService
 
     public G? GetCurrentGame<G>(string? gameMode) where G : class
     {
+        if (this.CurrentGame == null)
+        {
+            return null;
+        }
+        
         if (gameMode != null && this.CurrentGame.GameTemplate.Config.GameMode != gameMode)
         {
             throw new InvalidCastException("Requested game mode does not correspond to current game");
         }
         
-        return this.CurrentGame as G;
+        return (G)this.CurrentGame;
     }
 }

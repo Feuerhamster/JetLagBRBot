@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using JetLagBRBot.Models;
 using JetLagBRBot.Utils;
-using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -19,10 +18,8 @@ public class CommandService(IServiceProvider serviceProvider) : ICommandService
 {
     private readonly Dictionary<string, CustomBotCommandBase> Commands = new();
 
-    private readonly Regex commandMatcher = new Regex(@"/([a-z0-9_]+)");
-
-    private readonly ITelegramBotService _telegramBotService = serviceProvider.GetService<ITelegramBotService>();
-
+    private readonly Regex commandMatcher = new(@"/([a-z0-9_]+)");
+    
     public List<BotCommand> GetBotCommands()
     {
         List<BotCommand> botCommands = [];
@@ -64,14 +61,17 @@ public class CommandService(IServiceProvider serviceProvider) : ICommandService
         }
 
         // Handle constraints
-        foreach (var constraint in command.Constraints)
+        if (command.Constraints != null)
         {
-            var res = await constraint.Execute(_telegramBotService, msg);
+            foreach (var constraint in command.Constraints)
+            {
+                var res = await constraint.Execute(serviceProvider, msg);
 
-            if (res == false) return false;
+                if (res == false) return false;
+            }   
         }
         
-        command.Execute(msg, type);
+        await command.Execute(msg, type);
         return true;
     }
 
@@ -86,7 +86,7 @@ public class CommandService(IServiceProvider serviceProvider) : ICommandService
             return false;
         }
         
-        command.OnCallbackQuery(update, extractedUpdate.Value.Value);
+        await command.OnCallbackQuery(update, extractedUpdate.Value.Value);
         return true;
     }
 }

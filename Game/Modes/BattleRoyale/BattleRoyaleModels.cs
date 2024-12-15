@@ -28,17 +28,17 @@ public class PlayerTag(Guid taggerId, Guid victimId, int damage = 0)
 
 public class PlayerOrTeamStateData
 {
-    public int HealthPoints { get; set; }
-    public List<BasePowerUp> Powerups { get; set; }
+    public int HealthPoints { get; set; } = 3;
+    public List<BasePowerUp> Powerups { get; set; } = new();
 }
 
-public class Landmark(double latitude, double longitude, string name, string district, string image)
+public class Landmark
 {
     public Guid Id { get; set; } = new Guid();
-    public double[] Coordinates { get; set; } = [latitude, longitude];
-    public string Name { get; set; } = name;
-    public string District { get; set; } = district;
-    public string Image { get; set; } = image;
+    public float[] Coordinates { get; set; }
+    public string Name { get; set; }
+    public string District { get; set; }
+    public string ImagePath { get; set; }
     
     public bool Claimed { get; set; } = false;
 }

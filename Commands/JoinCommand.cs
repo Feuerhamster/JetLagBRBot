@@ -17,7 +17,7 @@ public class JoinCommandBase(IGameManagerService gameManagerService, ITelegramBo
         string name = $"{msg.From.FirstName} {msg.From.LastName}";
 
         var CurrentGame =
-            gameManagerService.GetCurrentGame<BaseGame<object, object, object>>(null);
+            gameManagerService.GetCurrentGame<IBaseGame>(null);
 
         if (CurrentGame == null)
         {
@@ -26,9 +26,17 @@ public class JoinCommandBase(IGameManagerService gameManagerService, ITelegramBo
             return;
         }
         
-        CurrentGame.PlayerJoin(msg.From.Id, name);
+        var joined = CurrentGame.PlayerJoin(msg.From.Id, name);
 
-        telegramBotService.Client.SendMessage(msg.Chat.Id,
-            $"Successfully joined the game \"{CurrentGame.GameTemplate.Config.Name}\"");
+        if (joined)
+        {
+            telegramBotService.Client.SendMessage(msg.Chat.Id,
+                $"Successfully joined the game \"{CurrentGame.GameTemplate.Config.Name}\"");
+        }
+        else
+        {
+            telegramBotService.Client.SendMessage(msg.Chat.Id,
+                $"You are already in the game \"{CurrentGame.GameTemplate.Config.Name}\"");
+        }
     }
 }

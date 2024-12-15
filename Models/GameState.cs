@@ -13,7 +13,7 @@ public enum EGameStatus
     Finished
 }
 
-public class Game<TGameState>(string name, long telegramGroupId)
+public class Game<TGameState>(string name, long telegramGroupId) where TGameState : class, new()
 {
     [BsonId] public Guid Id { get; set; } = new Guid();
 
@@ -23,7 +23,7 @@ public class Game<TGameState>(string name, long telegramGroupId)
 
     public long TelegramGroupId { get; set; } = telegramGroupId;
 
-    public TGameState GameStateData { get; set; }
+    public TGameState GameStateData { get; set; } = new();
 }
 
 public class Team<TTeamGameState>(string name)
@@ -45,7 +45,7 @@ public class Team<TTeamGameState>(string name)
 /// <param name="nickname">Name that gets displayed publicly throughout the game</param>
 /// <param name="tgId">Telegram user id of the player</param>
 /// <typeparam name="TPlayerGameState">Gamemode specific data</typeparam>
-public class Player<TPlayerGameState>(string nickname, long tgId)
+public class Player<TPlayerGameState>(string nickname, long tgId) where TPlayerGameState : class, new()
 {
     [BsonId]
     public Guid Id { get; set; } = new Guid();
@@ -58,5 +58,5 @@ public class Player<TPlayerGameState>(string nickname, long tgId)
 
     public string TelegramMention => TgFormatting.UserMention(TelegramId, Nickname);
 
-    public TPlayerGameState PlayerGameStateData { get; set; }
+    public TPlayerGameState PlayerGameStateData { get; set; } = new();
 }

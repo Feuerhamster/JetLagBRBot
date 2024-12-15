@@ -23,6 +23,14 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
         
         var keyboard = new InlineKeyboardChoiceFactory(this.Command);
         
+        var playerInGame = currentGame.Players.Exists(p => p.TelegramId == msg.From.Id);
+
+        if (!playerInGame)
+        {
+            bot.Client.SendMessage(msg.Chat.Id, "You are not in a game");
+            return;
+        }
+        
         foreach (var player in currentGame.Players)
         {
             keyboard.AddChoice(player.Nickname, player.Id.ToString());

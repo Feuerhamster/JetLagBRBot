@@ -11,9 +11,14 @@ namespace JetLagBRBot.Game;
 public interface IBaseGame
 {
     public GameTemplate GameTemplate { get; }
+    public bool PlayerJoin(long telegramId, string nickname);
+    public bool LeavePlayer(long telegramId);
+    public void StopGame();
+    public void ResetGame();
+    public void StartGame();
 }
 
-public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame
+public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame where TGameState : class, new() where TPlayerGameState : class, new()
 {
     private readonly ITelegramBotService _telegramBot; 
     
@@ -45,15 +50,15 @@ public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : I
         this.CheckProtectionTime();
     }
 
-    private void CheckProtectionTime()
+    private async Task CheckProtectionTime()
     {
         if (this.Game.Status != EGameStatus.ProtectionPhase) return;
         if (this.GameTemplate.Config.ProtectionPhase is not TimeSpan protectionPhase) return;
         
         if (DateTime.Now >= this.GameTimer.TimeStarted.Add(protectionPhase))
         {
+            await this.BroadcastMessage("\u2622\ufe0f Protection phase is over!");
             this.Game.Status = EGameStatus.Running;
-            this.BroadcastMessage("\u2622\ufe0f Protection phase is over!");
         }
     }
 
@@ -77,10 +82,16 @@ public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : I
     /// </summary>
     /// <param name="telegramId">Telegram User ID</param>
     /// <param name="nickname"></param>
-    public void PlayerJoin(long telegramId, string nickname)
+    public bool PlayerJoin(long telegramId, string nickname)
     {
+        if (this.Players.Exists(p => p.TelegramId == telegramId)) return false;
+        
         Player<TPlayerGameState> p = new(nickname, telegramId);
         this.Players.Add(p);
+
+        this.BroadcastMessage($"{p.Nickname} joined the game");
+        
+        return true;
     }
 
     /// <summary>
@@ -95,6 +106,9 @@ public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : I
         if (p == null) return false;
         
         this.Players.Remove(p);
+        
+        this.BroadcastMessage($"{p.Nickname} left the game");
+        
         return true;
     }
 
@@ -103,6 +117,7 @@ public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : I
     /// </summary>
     public void StartGame()
     {
+        // TODO: make async
         this.GameTimer.Start();
         
         this.BroadcastMessage("\ud83d\udfe2 The game has been started!");
@@ -111,7 +126,7 @@ public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : I
         {
             this.Game.Status = EGameStatus.ProtectionPhase;
             
-            var protectionUntil = DateTime.Now.Add(this.GameTemplate.Config.Duration).ToString("HH:mm:ss");
+            var protectionUntil = DateTime.Now.Add((TimeSpan)this.GameTemplate.Config.ProtectionPhase).ToString("HH:mm:ss");
 
             this.BroadcastMessage($"\ud83d\udee1\ufe0f Protection phase unitl {protectionUntil}");
         }
@@ -145,7 +160,8 @@ public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : I
     /// <param name="message">text message for the group</param>
     public async Task BroadcastMessage(string message, IReplyMarkup replyMarkup = null)
     {
-        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
+        message = message.Replace("!", @"\!");
+        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.None);
     }
     
     /// <summary>
@@ -156,7 +172,7 @@ public abstract class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : I
     {
         var p = this.GetPlayerById(playerId);
         
-        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
+        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.None);
     }
 
     public Player<TPlayerGameState>? GetPlayerById(Guid playerId)

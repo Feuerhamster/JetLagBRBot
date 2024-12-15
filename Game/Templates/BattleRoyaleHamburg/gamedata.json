@@ -1,13 +1,13 @@
 {
-  "TimeBetweenDrops": "00:20:00",
+  "TimeBetweenDrops": "00:01:00",
   "Landmarks": [
     {
       "District": "Altstadt",
       "Name": "Globus-Brunnen",
       "Address": "",
       "Coordinates": [
-        53546979,
-        9991107
+        53.546978,
+        9.991107
       ],
       "ImagePath": "images/globus-brunnen.jpeg"
     },
@@ -16,8 +16,8 @@
       "Name": "Heinrich-Heine-Denkmal",
       "Address": "Rathausmarkt, 20095 Hamburg",
       "Coordinates": [
-        535504612,
-        99936483
+        53.55046,
+        9.993649
       ],
       "ImagePath": "images/heinrich-heine-denkmal.jpg"
     },
@@ -26,8 +26,8 @@
       "Name": "Hygieia-Brunnen",
       "Address": "",
       "Coordinates": [
-        53550243,
-        9992051
+        53.550243,
+        9.992051
       ],
       "ImagePath": "images/hygieia-brunnen.jpg"
     },
@@ -36,8 +36,8 @@
       "Name": "Johann-Georg-M\u00F6nckeberg-Denkmal",
       "Address": "Altstadt, 20095 Hamburg",
       "Coordinates": [
-        535512417,
-        100008004
+        53.551243,
+        10.0008
       ],
       "ImagePath": "images/johann-georg-moenckeberg-denkmal.jpg"
     },
@@ -46,8 +46,8 @@
       "Name": "Neuer Kran",
       "Address": "b. dem Neuen Krahn 2, 20457 Hamburg",
       "Coordinates": [
-        535447104,
-        99885155
+        53.544712,
+        9.988516
       ],
       "ImagePath": "images/neuer-kran.jpg"
     },
@@ -56,8 +56,8 @@
       "Name": "Rette den Wald",
       "Address": "",
       "Coordinates": [
-        53549847,
-        9997084
+        53.549847,
+        9.997084
       ],
       "ImagePath": "images/rette-den-wald.jpg"
     },
@@ -66,8 +66,8 @@
       "Name": "Skulptur von Jens-Flemming S\u00F8rensen (1993)",
       "Address": "Klingberg, 20457 Hamburg",
       "Coordinates": [
-        53547897,
-        100006046
+        53.547897,
+        10.000605
       ],
       "ImagePath": "images/skulptur-von-jens-flemming-sorensen.jpg"
     },
@@ -76,28 +76,28 @@
       "Name": "Bismarck-Denkmal",
       "Address": "",
       "Coordinates": [
-        53548709,
-        9972092
+        53.54871,
+        9.972092
       ],
       "ImagePath": "images/bismarck-denkmal.jpg"
     },
     {
       "District": "Neustadt",
-      "Name": "Cap San Diego (Steg)",
+      "Name": "Cap San Diego (Steg am Schiff ber\u00FChren reicht!)",
       "Address": "",
       "Coordinates": [
-        53543001,
-        9976752
+        53.543,
+        9.976752
       ],
-      "ImagePath": "images/cap-san-diego.jpg"
+      "ImagePath": null
     },
     {
       "District": "Neustadt",
       "Name": "Hummel-Denkmal",
       "Address": "",
       "Coordinates": [
-        53552232,
-        9981852
+        53.55223,
+        9.981852
       ],
       "ImagePath": "images/hummel-denkmal.jpg"
     },
@@ -106,8 +106,8 @@
       "Name": "Lessing-Denkmal",
       "Address": "",
       "Coordinates": [
-        53555161,
-        9988517
+        53.55516,
+        9.988517
       ],
       "ImagePath": "images/lessing-denkmal.jpg"
     },
@@ -116,8 +116,8 @@
       "Name": "Morgenstunde",
       "Address": "",
       "Coordinates": [
-        5355049,
-        9978368
+        53.55049,
+        9.978368
       ],
       "ImagePath": "images/morgenstunde.jpg"
     },
@@ -126,8 +126,8 @@
       "Name": "Die Windsbraut",
       "Address": "",
       "Coordinates": [
-        53557075,
-        999375
+        53.557076,
+        9.99375
       ],
       "ImagePath": "images/die-windsbraut.jpg"
     },
@@ -136,8 +136,8 @@
       "Name": "Wand-Lung",
       "Address": "St Pauli, 20355 Hamburg",
       "Coordinates": [
-        535575662,
-        99804615
+        53.557568,
+        9.980461
       ],
       "ImagePath": "images/wand-lung.jpg"
     },
@@ -146,8 +146,8 @@
       "Name": "Skulptur Liegende",
       "Address": "",
       "Coordinates": [
-        535584718,
-        99886671
+        53.55847,
+        9.9886675
       ],
       "ImagePath": "images/skulptur-liegende.jpg"
     },
@@ -156,8 +156,8 @@
       "Name": "Sonnenuhr (Planten un Blomen)",
       "Address": "",
       "Coordinates": [
-        53562572,
-        9979952
+        53.562572,
+        9.979952
       ],
       "ImagePath": "images/sonnenuhr-planten-un-blomen.jpg"
     },
@@ -166,8 +166,8 @@
       "Name": "PENNY-Markt auf der Reeperbahn",
       "Address": "",
       "Coordinates": [
-        53549752,
-        9960497
+        53.54975,
+        9.960497
       ],
       "ImagePath": "images/penny-markt-auf-der-reeperbahn.jpg"
     },
@@ -176,8 +176,8 @@
       "Name": "St.Pauli Logo-Statue",
       "Address": "",
       "Coordinates": [
-        53553362,
-        9966276
+        53.553364,
+        9.966276
       ],
       "ImagePath": "images/st-pauli-logo-statue.JPG"
     },
@@ -186,18 +186,18 @@
       "Name": "Skulptur Kaiser Wilhelm I.",
       "Address": "Johannes-Brahms-Platz, 20355 Hamburg",
       "Coordinates": [
-        535553782,
-        99780988
+        53.555378,
+        9.978099
       ],
       "ImagePath": "images/skulptur-kaiser-wilhelm-i.jpg"
     },
     {
       "District": "St. Pauli",
-      "Name": "Japanischer Garten (Japanisches Teehaus)",
+      "Name": "Japanisches Teehaus (Japanischer Garten)",
       "Address": "Marseiller Str. 7, 20355 Hamburg",
       "Coordinates": [
-        535606872,
-        99833942
+        53.560688,
+        9.983395
       ],
       "ImagePath": "images/japanischer-garten-japanisches-teehaus.jpg"
     }

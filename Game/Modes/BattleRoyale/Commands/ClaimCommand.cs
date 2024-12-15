@@ -9,8 +9,8 @@ namespace JetLagBRBot.Game.Modes.BattleRoyale.Commands;
 
 public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManagerService) : CustomBotCommandBase(bot)
 {
-    public override string Command { get; } = "tag";
-    public override string Description { get; } = "Tags a player";
+    public override string Command { get; } = "claim";
+    public override string Description { get; } = "Claim the current landmark and get the power up";
     public async override Task Execute(Message msg, UpdateType type)
     {
         var currentGame =
@@ -24,11 +24,8 @@ public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManag
         
         var keyboard = new InlineKeyboardChoiceFactory(this.Command);
         
-        foreach (var player in currentGame.Players)
-        {
-            keyboard.AddChoice("Yes", bool.TrueString);
-            keyboard.AddChoice("No", bool.FalseString);
-        }
+        keyboard.AddChoice("Yes", bool.TrueString);
+        keyboard.AddChoice("No", bool.FalseString);
         
         await bot.Client.SendMessage(
             msg.Chat.Id,
@@ -52,6 +49,11 @@ public class ClaimCommand(ITelegramBotService bot, IGameManagerService gameManag
 
         if (p == null) return;
         
-        await currentGame.ClaimLandmark(p.Id);
+        var res = await currentGame.ClaimLandmark(p.Id);
+
+        if (res == false)
+        {
+            await currentGame.SendPlayerMessage(p.Id, "\u26a0\ufe0f Failed to claim the landmark. Maybe it is already claimed?");
+        }
     }
 }

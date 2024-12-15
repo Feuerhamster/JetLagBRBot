@@ -14,7 +14,7 @@ public class LeaveCommand(IGameManagerService gameManagerService, ITelegramBotSe
     public override async Task Execute(Message msg, UpdateType type)
     {
         var CurrentGame =
-            gameManagerService.GetCurrentGame<BaseGame<object, object, object>>(null);
+            gameManagerService.GetCurrentGame<IBaseGame>(null);
         
         if (CurrentGame == null)
         {

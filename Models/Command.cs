@@ -7,7 +7,7 @@ namespace JetLagBRBot.Models;
 
 public interface ICustomBotCommandConstraint
 {
-    public Task<bool> Execute(ITelegramBotService botService, Message msg);
+    public Task<bool> Execute(IServiceProvider serviceProvider, Message msg);
 }
 
 /// <summary>
@@ -16,8 +16,10 @@ public interface ICustomBotCommandConstraint
 /// <param name="chatType"></param>
 public class ChatTypeConstraint(ChatType chatType) : ICustomBotCommandConstraint
 {
-    public async Task<bool> Execute(ITelegramBotService botService, Message msg)
+    public async Task<bool> Execute(IServiceProvider serviceProvider, Message msg)
     {
+        var botService = serviceProvider.GetService<ITelegramBotService>();
+        
         if (msg.Chat.Type != chatType)
         {
             await botService.Client.SendMessage(
@@ -36,8 +38,10 @@ public class ChatTypeConstraint(ChatType chatType) : ICustomBotCommandConstraint
 /// </summary>
 public class OnlyGroupAdminConstraint : ICustomBotCommandConstraint
 {
-    public async Task<bool> Execute(ITelegramBotService botService, Message msg)
+    public async Task<bool> Execute(IServiceProvider serviceProvider, Message msg)
     {
+        var botService = serviceProvider.GetService<ITelegramBotService>();
+        
         var admins = await botService.Client.GetChatAdministrators(msg.Chat.Id);
 
         if (admins.FirstOrDefault(c => c.User.Id == msg.From.Id) == null)

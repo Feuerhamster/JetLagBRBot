@@ -22,7 +22,7 @@ public class GameTemplateService : IGameTemplateService
     {
         List<string> log = new();
         
-        var directories = Directory.GetDirectories($"{AppContext.BaseDirectory}/Game/Templates");
+        var directories = Directory.GetDirectories($"{AppContext.BaseDirectory}../../../Game/Templates");
         
         this.GameTemplates.Clear();
         
@@ -79,7 +79,7 @@ public class GameTemplateService : IGameTemplateService
 
         foreach (var template in this.GameTemplates)
         {
-            templateList.Add(new KeyValuePair<Guid, string>(template.id, template.Config.Name));
+            templateList.Add(new KeyValuePair<Guid, string>(template.Id, template.Config.Name));
         }
 
         return templateList;
@@ -87,12 +87,12 @@ public class GameTemplateService : IGameTemplateService
 
     public GameTemplate GetGameTemplate(Guid templateId)
     {
-        return this.GameTemplates.FirstOrDefault(x => x.id == templateId);
+        return this.GameTemplates.FirstOrDefault(x => x.Id.Equals(templateId));
     }
     
     public D LoadGameData<D>(Guid templateId)
     {
-        GameTemplate gameTemplate = this.GameTemplates.FirstOrDefault(x => x.id == templateId);
+        GameTemplate gameTemplate = this.GameTemplates.FirstOrDefault(x => x.Id == templateId);
 
         if (gameTemplate == null) throw new Exception("Game data not found for " + templateId);
 

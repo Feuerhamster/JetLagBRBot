@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using JetLagBRBot.Game;
 using JetLagBRBot.Game.Modes.BattleRoyale.Commands;
@@ -32,13 +33,17 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     {
         this.TimeBetweenDrops = data.TimeBetweenDrops;
         this._services = services;
+        
         this.Game.GameStateData.Landmarks = new(data.Landmarks);
         
         var commandService = services.GetRequiredService<ICommandService>();
         this._telegramBot = services.GetRequiredService<ITelegramBotService>();
         
         commandService.AddCommand<TagCommand>();
-
+        commandService.AddCommand<ClaimCommand>();
+        commandService.AddCommand<InvCommand>();
+        this._telegramBot.UpdateCommands();
+        
         this.GameTimer.OnTick += this.Tick;
         this.GameTimer.OnFinished += this.TimerFinised;
 
@@ -60,7 +65,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         if (this.Game.Status != EGameStatus.Running) return;
 
         if (DateTime.Now < this.Game.GameStateData.LastTimeDropped.Add(this.TimeBetweenDrops)) return;
-
+        
         this.NewLandmark();
     }
 
@@ -73,7 +78,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         // select new drop
         var newLandmark = this.Game.GameStateData.Landmarks
-            .Where(l => l.District != this.Game.GameStateData.CurrentActiveLandmark.District)
+            //.Where(l => l.District != this.Game.GameStateData.CurrentActiveLandmark.District)
             .OrderBy(l => rand.Next())
             .FirstOrDefault();
 
@@ -81,6 +86,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         this.Game.GameStateData.CurrentActiveLandmark = newLandmark;
         this.Game.GameStateData.Landmarks.Remove(newLandmark);
+        
+        this.Game.GameStateData.LastTimeDropped = DateTime.Now;
 
         StringBuilder message = new StringBuilder();
         message.AppendLine("\ud83d\udccc **New Powerup available at Landmark**");
@@ -88,13 +95,17 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         message.AppendLine($"Name: **{newLandmark.Name}**");
         message.AppendLine($"District: **{newLandmark.District}**");
 
-        string locationLink = $"https://www.google.com/maps/place/{newLandmark.Coordinates[0]},{newLandmark.Coordinates[1]}";
+        var lat = newLandmark.Coordinates[0].ToString(CultureInfo.InvariantCulture);
+        var lng = newLandmark.Coordinates[1].ToString(CultureInfo.InvariantCulture);
+        
+        string locationLink = $"https://www.google.com/maps/place/{lat},{lng}";
         
         message.AppendLine($"Location: **[{newLandmark.Coordinates[0]}, {newLandmark.Coordinates[1]}]({locationLink})**");
 
         await this.BroadcastMessage(message.ToString());
-        
-        var fileStream = System.IO.File.OpenRead(newLandmark.Image);
+
+        var imagePath = Path.Combine(this.GameTemplate.FilePath, newLandmark.ImagePath);
+        var fileStream = System.IO.File.OpenRead(imagePath);
         await this._telegramBot.Client.SendPhoto(this.Game.TelegramGroupId, new InputFileStream(fileStream));
     }
 
@@ -166,6 +177,9 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         claimer.PlayerGameStateData.Powerups.Add(powerUp);
         
         await this.BroadcastMessage($"\ud83c\udf1f {claimer.TelegramMention} claimed the PowerUp at the current Landmark \"{lm.Name}\"");
+
+        await this.SendPlayerMessage(claimerId, $"\ud83c\udf1f You have sucessfully claimed the Landmark \"{lm.Name}\" obtained the \"{powerUp.Name}\" power up");
+        
         return true;
     }
 

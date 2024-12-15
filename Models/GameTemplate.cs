@@ -2,7 +2,7 @@ namespace JetLagBRBot.Models;
 
 public class GameTemplate(GameTemplateConfigFile config, string filePath)
 {
-    public Guid id { get; private set; } = Guid.NewGuid();
+    public Guid Id { get; private set; } = Guid.NewGuid();
     public GameTemplateConfigFile Config { get; set; } = config;
     public string FilePath { get; set; } = filePath;
 }

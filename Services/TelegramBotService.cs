@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using JetLagBRBot.Models;
 using Telegram.Bot;
+using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
@@ -40,6 +41,14 @@ public class TelegramBotService : ITelegramBotService
         
         this.Client.OnMessage += this.OnMessage;
         this.Client.OnUpdate += this.OnUpdate;
+
+        this.Client.OnError += this.OnError;
+    }
+
+    private Task OnError(Exception e, HandleErrorSource h)
+    {
+        Console.WriteLine(e.Message);
+        return Task.CompletedTask;
     }
     
     private async Task OnMessage(Message msg, UpdateType type)
@@ -75,7 +84,7 @@ public class TelegramBotService : ITelegramBotService
     /// </summary>
     public async Task UpdateCommands()
     {
-        //await this.Client.DeleteMyCommands();
+        await this.Client.DeleteMyCommands();
         await this.Client.SetMyCommands(this._commandService.GetBotCommands());
     }
 }

@@ -38,7 +38,7 @@ public class NewGameCommand(ITelegramBotService telegramBotService, IGameTemplat
         );
     }
 
-    public async Task OnCallbackQuery(Update update, string? payloadData)
+    public override async Task OnCallbackQuery(Update update, string? payloadData)
     {
         var t = gameTemplateService.GetGameTemplate(new Guid(payloadData));
 
@@ -51,7 +51,7 @@ public class NewGameCommand(ITelegramBotService telegramBotService, IGameTemplat
             return;
         }
         
-        gameManagerService.InitNewGame(t.id, update.Message.Chat.Id);
+        gameManagerService.InitNewGame(t.Id, update.CallbackQuery.Message.Chat.Id);
         
         await telegramBotService.Client.SendMessage(
             update.CallbackQuery.Message.Chat.Id,

@@ -15,7 +15,7 @@ public class ManagedTimer
     public TimeSpan Duration { get; set; }
     public DateTime TimeStarted { get; private set; }
     
-    public ManagedTimer(TimeSpan duration, int tickDuration = 20000)
+    public ManagedTimer(TimeSpan duration, int tickDuration = 5000)
     {
         this.Duration = duration;
         this._timer = new System.Timers.Timer(tickDuration);

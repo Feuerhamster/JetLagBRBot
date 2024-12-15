@@ -23,11 +23,16 @@ IGameTemplateService gameTemplateService = app.Services.GetService<IGameTemplate
 var templateLog = gameTemplateService.ReloadTemplates();
 Console.WriteLine(String.Join("\n", templateLog.ToArray()));
 
-// init game manager
-app.Services.GetService<IGameManagerService>();
+app.Services.GetService<ICommandService>();
 
 // init telegram bot
 app.Services.GetService<ITelegramBotService>();
+
+// init game manager
+IGameManagerService gameManagerService = app.Services.GetService<IGameManagerService>();
+
+gameManagerService.LoadCommands();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
