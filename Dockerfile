@@ -21,4 +21,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY --from=build /src/Game/Templates Game/Templates
+RUN chown -R app:app /app
 ENTRYPOINT ["dotnet", "JetLagBRBot.dll"]
