@@ -4,6 +4,7 @@ using JetLagBRBot.Game.Modes.BattleRoyale;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using File = System.IO.File;
 
 namespace JetLagBRBot.Services;
 
@@ -41,7 +42,11 @@ public class GameManagerService(ICommandService commandService, ITelegramBotServ
             case BattleRoyaleGamemode.GameModeName:
             {
                 var data = gameTemplateService.LoadGameData<BattleRoyaleGameData>(templateId);
+                
                 this.CurrentGame = new BattleRoyaleGamemode(template, data, tgGroupId, serviceProvider);
+
+                this.CurrentGame.TryLoadSaveGame();
+                
                 break;
             }
         }

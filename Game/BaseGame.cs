@@ -1,3 +1,4 @@
+using System.Text.Json;
 using JetLagBRBot.Models;
 using JetLagBRBot.Services;
 using JetLagBRBot.Utils;
@@ -5,6 +6,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using File = System.IO.File;
 
 namespace JetLagBRBot.Game;
 
@@ -15,17 +17,20 @@ public interface IBaseGame
     public bool LeavePlayer(long telegramId);
     public void StopGame();
     public void ResetGame();
-    public void StartGame();
+    public Task StartGame();
     public bool HasPlayer(long telegramId);
+    public Task TryLoadSaveGame();
 }
 
 public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame where TGameState : class, new() where TPlayerGameState : class, new()
 {
+    public const string TEMP_STATE_FILE = "temp_current_game_state.json";
+    
     private readonly ITelegramBotService _telegramBot; 
     
     public Game<TGameState> Game { get; private set; }
 
-    public ManagedTimer GameTimer { get; }
+    public ManagedTimer GameTimer { get; private set; }
     
     public GameTemplate GameTemplate { get; }
 
@@ -49,6 +54,7 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     private void Tick(object sender, EventArgs e)
     {
         this.CheckProtectionTime();
+        this.SaveGameState();
     }
 
     private async Task CheckProtectionTime()
@@ -63,6 +69,62 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
         }
     }
 
+    public async Task SaveGameState()
+    {
+        var state = new TempGameStateFile<TGameState, TPlayerGameState>()
+        {
+            Game = this.Game,
+            Players = this.Players,
+            GameTimer = this.GameTimer
+        };
+        
+        var json = JsonSerializer.Serialize(state, new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            MaxDepth = 64
+        });
+        
+        var path = Path.Combine(this.GameTemplate.FilePath, TEMP_STATE_FILE);
+
+        await File.WriteAllTextAsync(path, json);
+    }
+
+    public async Task TryLoadSaveGame()
+    {
+        var path = Path.Combine(this.GameTemplate.FilePath, TEMP_STATE_FILE);
+
+        if (!File.Exists(path)) return;
+        
+        await this.BroadcastMessage($"\ud83d\udcbe A save game file found for a running game! Game will be re-initalized");
+        
+        var json = await File.ReadAllTextAsync(path);
+
+
+        TempGameStateFile<TGameState, TPlayerGameState> state;
+        try
+        {
+            state = JsonSerializer.Deserialize<TempGameStateFile<TGameState, TPlayerGameState>>(json, new JsonSerializerOptions()
+            {
+                IncludeFields = true,
+                MaxDepth = 64
+            });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return;
+        }
+
+        
+        this.Game = state.Game;
+        this.Players = state.Players;
+        this.GameTimer.TimeStarted = state.GameTimer.TimeStarted;
+        this.GameTimer.Duration = state.GameTimer.Duration;
+        
+        await this.BroadcastMessage($"\ud83d\udcbe Game re-initialized. Starting now!");
+        this.GameTimer.Start();
+    }
+    
     private void OnUserLocation(object? sender, Message msg)
     {
         var p = this.Players.FirstOrDefault(p => p.TelegramId == msg.From.Id);
@@ -72,10 +134,13 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
         p.Location = msg.Location;
     }
 
-    private void GameEnd(object sender, EventArgs e)
+    protected void GameEnd(object sender, EventArgs e)
     {
         this.Game.Status = EGameStatus.Finished;
         this.BroadcastMessage("\ud83c\udfc1 The game has finished!");
+        
+        var path = Path.Combine(this.GameTemplate.FilePath, TEMP_STATE_FILE);
+        File.Delete(path);
     }
 
     public bool HasPlayer(long telegramId)
@@ -121,20 +186,19 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     /// <summary>
     /// Start the game
     /// </summary>
-    public void StartGame()
+    public async Task StartGame()
     {
-        // TODO: make async
         this.GameTimer.Start();
         
-        this.BroadcastMessage("\ud83d\udfe2 The game has been started!");
+        await this.BroadcastMessage("\ud83d\udfe2 The game has been started!");
 
-        if (this.GameTemplate.Config.ProtectionPhase != null)
+        if (this.GameTemplate.Config.ProtectionPhase != null && this.Game.Status != EGameStatus.Stopped)
         {
             this.Game.Status = EGameStatus.ProtectionPhase;
             
             var protectionUntil = DateTime.Now.Add((TimeSpan)this.GameTemplate.Config.ProtectionPhase).ToString("HH:mm:ss");
 
-            this.BroadcastMessage($"\ud83d\udee1\ufe0f Protection phase unitl {protectionUntil}");
+            await this.BroadcastMessage($"\ud83d\udee1\ufe0f Protection phase unitl {protectionUntil}");
         }
         else
         {
@@ -157,6 +221,11 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
         this.GameTimer.Reset();
         this.Game = new Game<TGameState>(GameTemplate.Config.Name, this.Game.TelegramGroupId);
         this.Players.Clear();
+        
+        var path = Path.Combine(this.GameTemplate.FilePath, TEMP_STATE_FILE);
+        
+        if (File.Exists(path)) File.Delete(path);
+        
         this.BroadcastMessage("ℹ\ufe0f The game has been reset!");
     }
 

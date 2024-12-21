@@ -46,7 +46,7 @@ public class CommandService(IServiceProvider serviceProvider) : ICommandService
     public void AddCommand<C>() where C : CustomBotCommandBase
     {
         var cmd = ActivatorUtilities.CreateInstance<C>(serviceProvider);
-        this.Commands.Add(cmd.Command, cmd);
+        this.Commands[cmd.Command] = cmd;
     }
 
     public async Task<bool> HandleCommand(Message msg, UpdateType type)
@@ -67,7 +67,7 @@ public class CommandService(IServiceProvider serviceProvider) : ICommandService
             {
                 var res = await constraint.Execute(serviceProvider, msg);
 
-                if (res == false) return false;
+                if (res == false) return true;
             }   
         }
         

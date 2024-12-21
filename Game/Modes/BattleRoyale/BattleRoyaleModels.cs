@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using JetLagBRBot.Game.Modes.BattleRoyale.Utils;
 
 namespace JetLagBRBot.Game.Modes.BattleRoyale;
@@ -5,31 +6,52 @@ namespace JetLagBRBot.Game.Modes.BattleRoyale;
 
 public class GameStateData
 {
-    public List<Landmark> Landmarks = new();
+    public List<Landmark> Landmarks { get; set; } = new();
 
     /// <summary>
     /// Key is the tagger and value the victim
     /// </summary>
-    public List<PlayerTag> PlayerTags = new();
+    public List<PlayerTag> PlayerTags { get; set; } = new();
 
-    public DateTime LastTimeDropped = DateTime.MinValue;
+    public DateTime LastTimeDropped { get; set; } = DateTime.MinValue;
     
-    public Landmark? CurrentActiveLandmark = null;
+    public Landmark? CurrentActiveLandmark { get; set; } = null;
 }
 
-public class PlayerTag(Guid taggerId, Guid victimId, int damage = 1)
+public class PlayerTag
 {
+    [JsonConstructor]
+    private PlayerTag()
+    {
+        
+    }
+
+    public PlayerTag(Guid taggerId, Guid victimId, int damage = 1)
+    {
+        TaggerId = taggerId;
+        VictimId = victimId;
+        Damage = damage;
+    }
+    
     public Guid TagId { get; private set; } = Guid.NewGuid();
     public DateTime TagTime { get; set; } = DateTime.Now;
-    public Guid TaggerId { get; set; } = taggerId;
-    public Guid VictimId { get; set; } = victimId;
-    public int Damage { get; set; } = damage;
+    public Guid TaggerId { get; set; }
+    public Guid VictimId { get; set; }
+    public int Damage { get; set; }
+}
+
+public enum EPlayerTagStatus
+{
+    Default,
+    Frozen,
+    Protected
 }
 
 public class PlayerOrTeamStateData
 {
     public int HealthPoints { get; set; } = 3;
     public List<BasePowerUp> Powerups { get; set; } = new();
+    public EPlayerTagStatus TagStatus { get; set; } = EPlayerTagStatus.Default;
 }
 
 public class Landmark
@@ -47,8 +69,8 @@ public class BattleRoyaleGameData
 {
     public TimeSpan TimeBetweenDrops { get; set; }
     public List<Landmark> Landmarks { get; set; }
-    public TimeSpan? TagFreeze { get; set; }
-    public TimeSpan? AfterTagProtection { get; set; }
+    public TimeSpan TagFreeze { get; set; }
+    public TimeSpan AfterTagProtection { get; set; }
 }
 
 public class TagEventArgs(PlayerTag tag) : EventArgs

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using System.Timers;
 
 namespace JetLagBRBot.Utils;
@@ -13,7 +14,13 @@ public class ManagedTimer
     private readonly System.Timers.Timer _timer;
 
     public TimeSpan Duration { get; set; }
-    public DateTime TimeStarted { get; private set; }
+    public DateTime TimeStarted { get; set; }
+
+    [JsonConstructor]
+    private ManagedTimer()
+    {
+        
+    }
     
     public ManagedTimer(TimeSpan duration, int tickDuration = 5000)
     {
@@ -49,6 +56,13 @@ public class ManagedTimer
         this.TimeStarted = default;
     }
 
+    public void Finish()
+    {
+        this._timer.Stop();
+        this.OnFinished?.Invoke(this, EventArgs.Empty);
+        this.Reset();
+    }
+
     private void Tick(object sender, ElapsedEventArgs e)
     {
         this.OnTick?.Invoke(this, EventArgs.Empty);
@@ -56,8 +70,7 @@ public class ManagedTimer
         // check if timer has finished
         if (DateTime.Now >= this.TimeStarted.Add(this.Duration))
         {
-            this.OnFinished?.Invoke(this, EventArgs.Empty);
-            this.Reset();
+            this.Finish();
         }
     }
 }

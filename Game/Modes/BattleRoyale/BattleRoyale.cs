@@ -23,6 +23,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     
     private readonly IDatabaseService _database;
 
+    private readonly BattleRoyaleGameData GameData;
+
     public event EventHandler<TagEventArgs> OnPlayerTag = delegate { }; 
     
     public event EventHandler<SuccessfulTagEventArgs> OnSuccessfulPlayerTag = delegate { };
@@ -40,6 +42,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         this._database = services.GetRequiredService<IDatabaseService>();
         
         this.Game.GameStateData.Landmarks = new(data.Landmarks);
+        
+        this.GameData = data;
         
         var commandService = services.GetRequiredService<ICommandService>();
         this._telegramBot = services.GetRequiredService<ITelegramBotService>();
@@ -59,6 +63,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     private void Tick(object? sender, EventArgs e)
     {
         this.CheckForNextLandmark();
+        this.PostTagProtectionAlgorithm();
     }
 
     private void TimerFinised(object? sender, EventArgs e)
@@ -73,6 +78,42 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         if (DateTime.Now < this.Game.GameStateData.LastTimeDropped.Add(this.TimeBetweenDrops)) return;
         
         this.NewLandmark();
+    }
+
+    private async Task PostTagProtectionAlgorithm()
+    {
+        var players = this.Players.Where(p => p.PlayerGameStateData.TagStatus != EPlayerTagStatus.Default);
+
+        foreach (var player in players)
+        {
+            var tag = this.Game.GameStateData.PlayerTags.FirstOrDefault(t => t.VictimId.Equals(player.Id));
+
+            if (tag == null)
+            {
+                player.PlayerGameStateData.TagStatus = EPlayerTagStatus.Default;
+                continue;
+            }
+
+            // player is frozen but freeze is over
+            if (player.PlayerGameStateData.TagStatus == EPlayerTagStatus.Frozen &&
+                DateTime.Now >= tag.TagTime.Add(this.GameData.TagFreeze))
+            {
+                player.PlayerGameStateData.TagStatus = EPlayerTagStatus.Protected;
+                await this.SendPlayerMessage(player.Id, $"\u2744\ufe0f You are not frozen anymore and are allowed to move again.");
+                await this.BroadcastMessage($"\u2744\ufe0f {player.TelegramMention} is now allowed to move again.");
+                continue;
+            }
+            
+            // player is protected but personal protection after tag expired
+            if (player.PlayerGameStateData.TagStatus == EPlayerTagStatus.Protected &&
+                DateTime.Now >= tag.TagTime.Add(this.GameData.AfterTagProtection))
+            {
+                player.PlayerGameStateData.TagStatus = EPlayerTagStatus.Default;
+                await this.SendPlayerMessage(player.Id, $"\ud83d\udee1\ufe0f You are not protected anymore and you can now be tagged again.");
+                await this.BroadcastMessage($"\ud83d\udee1\ufe0f {player.TelegramMention} can now be tagged again.");
+                continue;
+            }
+        }
     }
 
     /// <summary>
@@ -152,6 +193,26 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         }
         
         var tag = new PlayerTag(tagger.Id, victim.Id);
+
+        // check tag status of victim and tagger because of the freeze and protection phase
+
+        if (tagger.PlayerGameStateData.TagStatus == EPlayerTagStatus.Frozen)
+        {
+            await this.SendPlayerMessage(taggerId,
+                "\u26d4 You are currently not allowed to tag others since you were recently tagged and are in freeze");
+            await this.BroadcastMessage(
+                $"\u26d4 The tag from {tagger.TelegramMention} on {victim.TelegramMention} is invalid since {tagger.TelegramMention} is in freeze from a recent tag.");
+            return;
+        }
+
+        if (victim.PlayerGameStateData.TagStatus == EPlayerTagStatus.Protected)
+        {
+            await this.SendPlayerMessage(taggerId,
+                $"\u26d4 You are currently not allowed to tag {victim.TelegramMention} because they were already recently tagged.");
+            await this.BroadcastMessage(
+                $"\u26d4 The tag from {tagger.TelegramMention} on {victim.TelegramMention} is invalid since {victim.TelegramMention} was already recently tagged.");
+            return;
+        }
         
         // fire event
         var eventArgs = new TagEventArgs(tag);
@@ -164,11 +225,17 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             return;
         }
         
+        // execute tag
         this.OnSuccessfulPlayerTag.Invoke(this, new SuccessfulTagEventArgs(tag));
-        
         this.Game.GameStateData.PlayerTags.Add(tag);
-
         victim.PlayerGameStateData.HealthPoints -= tag.Damage;
+
+        victim.PlayerGameStateData.TagStatus = EPlayerTagStatus.Frozen;
+        
+        // protection
+        var frozenDate = DateTime.Now.Add((TimeSpan)this.GameData.TagFreeze).ToString("HH:mm:ss");
+        var protectedDate = DateTime.Now.Add((TimeSpan)this.GameData.AfterTagProtection).ToString("HH:mm:ss");
+        await this.SendPlayerMessage(victim.Id, $"\ud83d\udee1\ufe0f {victim.TelegramMention} You are now frozen until {frozenDate} and you shall not move and cannot tag others.\n You are also protected until {protectedDate} and can't be tagged by others.");
         
         await this.BroadcastMessage($"\ud83d\udea9 Player {tagger.TelegramMention} successfully tagged {victim.TelegramMention}!");
     }
@@ -303,7 +370,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         if (aliveCount <= 1)
         {
-            //this.FinishGame();
+            this.FinishGame();
         }
     }
 
@@ -377,7 +444,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             text.AppendLine($"\ud83d\udc9a Health points: **{player.PlayerGameStateData.HealthPoints}**");
             text.AppendLine($"\ud83c\udf1f Power ups: **{player.PlayerGameStateData.Powerups.Count}**");
             
-            var tags = this.Game.GameStateData.PlayerTags.Where(t => t.TaggerId.Equals(player.Id));
+            var tags = this.Game.GameStateData.PlayerTags.Count(t => t.TaggerId.Equals(player.Id));
             text.AppendLine($"\ud83d\udea9 Tags: **{tags}**");
             text.AppendLine("");
         }

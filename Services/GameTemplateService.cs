@@ -15,6 +15,7 @@ public class GameTemplateService : IGameTemplateService
 {
     private const string CONFIG_FILE = "config.json";
     private const string GAMEDATA_FILE = "gamedata.json";
+    private const string ID_FILE = "id.guid";
         
     private List<GameTemplate> GameTemplates { get; set; } = new();
 
@@ -62,8 +63,19 @@ public class GameTemplateService : IGameTemplateService
                 log.Add("");
                 continue;
             }
+            
+            var idPath = Path.Combine(dir, ID_FILE);
 
             var t = new GameTemplate(config, dir);
+            
+            if (File.Exists(idPath))
+            {
+                t.Id = Guid.Parse(File.ReadAllText(idPath));
+            }
+            else
+            {
+                File.WriteAllText(idPath, t.Id.ToString());
+            }
             
             this.GameTemplates.Add(t);
 
