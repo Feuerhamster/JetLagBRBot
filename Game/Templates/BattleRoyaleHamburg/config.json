@@ -1,6 +1,6 @@
 {
   "GameMode": "BattleRoyale",
   "Name": "Battle Royale Hamburg",
-  "Duration": "00:20:00",
-  "ProtectionPhase": "00:00:10"
+  "Duration": "02:00:00",
+  "ProtectionPhase": "00:15:00"
 }
