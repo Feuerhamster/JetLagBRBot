@@ -22,8 +22,12 @@ public class GameTemplateService : IGameTemplateService
     public List<string>  ReloadTemplates()
     {
         List<string> log = new();
+
+        var baseDir = AppContext.BaseDirectory;
         
-        var directories = Directory.GetDirectories($"{AppContext.BaseDirectory}../../../Game/Templates");
+        var path = Path.Combine(baseDir, "Game/Templates");
+        
+        var directories = Directory.GetDirectories(path);
         
         this.GameTemplates.Clear();
         
