@@ -29,9 +29,13 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
         }
         
         var keyboard = new InlineKeyboardChoiceFactory(this.Command);
+
+        var myself = currentGame.Players.First(p => p.TelegramId == msg.From.Id);
         
         foreach (var player in currentGame.Players)
         {
+            if (player.Id.Equals(myself.Id)) continue;
+            
             keyboard.AddChoice(player.Nickname, player.Id.ToString());
         }
         

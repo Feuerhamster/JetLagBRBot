@@ -84,6 +84,8 @@ public class UseCommand(ITelegramBotService bot, IGameManagerService gameManager
         
             foreach (var player in currentGame.Players)
             {
+                if (player.Id.Equals(currentPlayer.Id)) continue;
+                
                 var payload = TgFormatting.EncodeCallbackPayloadData([
                     ShortGuidHelper.GetShortId(powerUpId), ShortGuidHelper.GetShortId(player.Id)
                 ]);
