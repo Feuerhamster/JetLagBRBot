@@ -131,6 +131,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         var rand = new Random();
         
         // select new drop
+        // TODO: please fix - Landmark list sometimes empty on game start or during game
         var newLandmark = this.Game.GameStateData.Landmarks
             .Where(l => (this.Game.GameStateData.CurrentActiveLandmark == null || l.District != this.Game.GameStateData.CurrentActiveLandmark.District) || this.Game.GameStateData.Landmarks.All(c => c.District == l.District))
             .OrderBy(l => rand.Next())
@@ -293,7 +294,6 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         if (claimer == null) return false;
         
-        // TODO: implement actual powerup claim
         var randomPowerUp = PowerUpUtils.RandomPowerUp();
         var powerUp = PowerUpUtils.GetPowerUpInstance(randomPowerUp, this, claimer.Id);
         

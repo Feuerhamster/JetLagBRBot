@@ -87,6 +87,7 @@ public static class PowerUpUtils
 
     public static EPowerUp RandomPowerUp()
     {
+        // TODO: Fix and improve random selection algorithm (currently not really balancend: higher weigted power ups are too often)
         var selected = WeightedRandomSelector.SelectRandomItem(WeightedPowerUps);
         return selected.Item;
     } 

@@ -42,6 +42,7 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
 
     protected ManagedTimer Timer { get; private set; } = new(new TimeSpan(0,0, 0));
     
+    // TODO: make async
     public virtual void Use(string? input = null)
     {
         this.Status = EPowerUpStatus.Active;
@@ -65,6 +66,7 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
     /// </summary>
     public void Expire()
     {
+        // TODO: Stop timer if one exists
         this.Status = EPowerUpStatus.Expired;
         this.Gamemode.SendPlayerMessage(this.OwnerId, $"\u2b50 Your power up \"{this.Name}\" is now expired");
     }
