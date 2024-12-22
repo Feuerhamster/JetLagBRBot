@@ -67,7 +67,7 @@ public class Player<TPlayerGameState> where TPlayerGameState : class, new()
     
     public Player(string nickname, long tgId)
     {
-        this.Nickname = nickname;
+        this.Nickname = nickname.Trim();
         this.TelegramId = tgId;
     }
     

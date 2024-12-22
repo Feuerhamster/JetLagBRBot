@@ -56,7 +56,7 @@ public class Clairvoyance(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
 
         var p = this.Gamemode.Players.FirstOrDefault(p => p.Id.Equals(e.PlayerId));
         
-        this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83d\udd2e {p.Nickname} use the {e.PowerUp.Name} power up");
+        this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83d\udd2e {p.Nickname} used the {e.PowerUp.Name} power up");
     }
     
     private void OnLandmarkClaim(object? sender, PowerUpUseEventArgs e)

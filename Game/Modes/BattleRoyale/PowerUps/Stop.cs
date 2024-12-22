@@ -22,7 +22,7 @@ public class Stop(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gam
         base.Use();
 
         var targetId = Guid.Empty;
-        if (Guid.TryParse(input, out targetId)) return;
+        if (!Guid.TryParse(input, out targetId)) return;
         
         this.Target = this.Gamemode.Players.FirstOrDefault(p => p.Id.Equals(targetId));
 
@@ -31,7 +31,7 @@ public class Stop(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gam
         var player = this.Gamemode.GetPlayerById(this.OwnerId);
 
         this.Gamemode.BroadcastMessage($"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on {this.Target.TelegramMention}!\n{this.Target.TelegramMention} has to stop now for {this.TimerDurationMinutes}");
-        this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {player.TelegramMention} has used the \"\" power up on you. You have to stop now for {this.TimerDurationMinutes} minutes. If you are in public transport right now, exit on the next possible opportunty and stay there.");
+        this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on you. You have to stop now for {this.TimerDurationMinutes} minutes. If you are in public transport right now, exit on the next possible opportunty and stay there.");
     }
 
     protected override void OnTimerFinished(object? sender, EventArgs e)
