@@ -75,10 +75,14 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     {
         if (this.Game.Status != EGameStatus.Running) return;
 
+        Console.WriteLine($"Checking for next landmark ({ DateTime.Now.ToString("HH:mm:ss") })...");
+        Console.WriteLine($"New Landmark should drop at {this.Game.GameStateData.LastTimeDropped.Add(this.TimeBetweenDrops)}");
+        
         if (
             DateTime.Now > this.Game.GameStateData.LastTimeDropped.Add(this.TimeBetweenDrops) ||
             this.Game.GameStateData.CurrentActiveLandmark == null
         ) {
+            Console.WriteLine("Dropping new landmark...");
             this.NewLandmark();
         }
     }
@@ -132,7 +136,11 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             .OrderBy(l => rand.Next())
             .FirstOrDefault();
 
-        if (newLandmark == null) return;
+        if (newLandmark == null)
+        {
+            Console.WriteLine("WARNING: No new landmark found!");
+            return;
+        }
         
         this.Game.GameStateData.CurrentActiveLandmark = newLandmark;
         this.Game.GameStateData.Landmarks.Remove(newLandmark);
