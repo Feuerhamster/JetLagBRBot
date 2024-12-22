@@ -19,7 +19,7 @@ public class Stealing(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp
         base.Use();
 
         var targetId = Guid.Empty;
-        if (Guid.TryParse(input, out targetId)) return;
+        if (!Guid.TryParse(input, out targetId)) return;
         
         this.Target = this.Gamemode.Players.FirstOrDefault(p => p.Id.Equals(targetId));
 
