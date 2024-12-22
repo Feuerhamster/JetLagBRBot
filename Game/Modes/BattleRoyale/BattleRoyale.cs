@@ -75,9 +75,12 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     {
         if (this.Game.Status != EGameStatus.Running) return;
 
-        if (DateTime.Now < this.Game.GameStateData.LastTimeDropped.Add(this.TimeBetweenDrops)) return;
-        
-        this.NewLandmark();
+        if (
+            DateTime.Now > this.Game.GameStateData.LastTimeDropped.Add(this.TimeBetweenDrops) ||
+            this.Game.GameStateData.CurrentActiveLandmark == null
+        ) {
+            this.NewLandmark();
+        }
     }
 
     private async Task PostTagProtectionAlgorithm()
