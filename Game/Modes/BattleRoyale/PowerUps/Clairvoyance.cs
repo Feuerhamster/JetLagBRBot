@@ -30,9 +30,11 @@ public class Clairvoyance(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
         {
             text.AppendLine($"{player.Nickname}:");
             
-            foreach (var powerUp in player.PlayerGameStateData.Powerups)
+            foreach (var powerUp in player.PlayerGameStateData.Powerups.Where(p => p.Status != EPowerUpStatus.Expired).ToList())
             {
-                text.AppendLine($"- {powerUp.Name}");
+                var status = powerUp.Status == EPowerUpStatus.Active ? "Active" : "Inactive";
+                
+                text.AppendLine($"- {powerUp.Name} ({status})");
             }
 
             text.AppendLine();
