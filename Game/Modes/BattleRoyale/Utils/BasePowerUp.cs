@@ -21,6 +21,8 @@ public enum EPowerUpInput
 /// </summary>
 /// <param name="gamemode"></param>
 /// <param name="ownerId"></param>
+///
+/// TODO: power ups are currently not serializable - fix in future for savegame functionality
 public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
