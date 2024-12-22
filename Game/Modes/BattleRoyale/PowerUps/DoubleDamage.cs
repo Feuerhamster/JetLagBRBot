@@ -12,14 +12,14 @@ public class DoubleDamage(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
     
     private Guid currentTag = Guid.Empty;
     
-    public override void Use(string? input)
+    public override async Task Use(string? input)
     {
-        base.Use();
+        await base.Use();
         
         this.Gamemode.OnPlayerTag += this.OnPlayerTag;
         this.Gamemode.OnSuccessfulPlayerTag += this.OnSuccessfulPlayerTag;
 
-        this.Gamemode.SendPlayerMessage(this.OwnerId,
+        await this.Gamemode.SendPlayerMessage(this.OwnerId,
             $"\ud83c\udf1f Your {this.Name} PowerUp is now active until used");
     }
     

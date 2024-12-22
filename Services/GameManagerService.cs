@@ -45,7 +45,7 @@ public class GameManagerService(ICommandService commandService, ITelegramBotServ
                 
                 this.CurrentGame = new BattleRoyaleGamemode(template, data, tgGroupId, serviceProvider);
 
-                this.CurrentGame.TryLoadSaveGame();
+                //this.CurrentGame.TryLoadSaveGame();
                 
                 break;
             }

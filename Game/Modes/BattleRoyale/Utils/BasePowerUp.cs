@@ -40,10 +40,10 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
     
     public virtual EPowerUpInput Input { get; } = EPowerUpInput.None;
 
+    // TODO: remove individual timers and implement this into the main game timer
     protected ManagedTimer Timer { get; private set; } = new(new TimeSpan(0,0, 0));
     
-    // TODO: make async
-    public virtual void Use(string? input = null)
+    public virtual async Task Use(string? input = null)
     {
         this.Status = EPowerUpStatus.Active;
 
@@ -64,7 +64,7 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
     /// <summary>
     /// Expire the power up so it is depleted and no longer usable
     /// </summary>
-    public void Expire()
+    public async Task Expire()
     {
         if (this.TimerDurationMinutes != null)
         {
@@ -72,6 +72,6 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
         }
         
         this.Status = EPowerUpStatus.Expired;
-        this.Gamemode.SendPlayerMessage(this.OwnerId, $"\u2b50 Your power up \"{this.Name}\" is now expired");
+        await this.Gamemode.SendPlayerMessage(this.OwnerId, $"\u2b50 Your power up \"{this.Name}\" is now expired");
     }
 }

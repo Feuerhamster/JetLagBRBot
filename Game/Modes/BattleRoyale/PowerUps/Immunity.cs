@@ -13,13 +13,13 @@ public class Immunity(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp
         "You cannot be tagged for 5 minutes. You can still get targeted by other power ups.";
     
     
-    public override void Use(string? input)
+    public override async Task  Use(string? input)
     {
-        base.Use();
+        await base.Use();
         
         this.Gamemode.OnPlayerTag += this.OnPlayerTag;
 
-        this.Gamemode.SendPlayerMessage(this.OwnerId,
+        await this.Gamemode.SendPlayerMessage(this.OwnerId,
             $"\ud83c\udf1f Your {this.Name} PowerUp is now active for {this.TimerDurationMinutes} minutes!");
     }
 

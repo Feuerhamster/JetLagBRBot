@@ -17,9 +17,9 @@ public class Stop(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gam
 
     private Player<PlayerOrTeamStateData> Target { get; set; }
     
-    public override void Use(string? input)
+    public override async Task  Use(string? input)
     {
-        base.Use();
+        await base.Use();
 
         var targetId = Guid.Empty;
         if (!Guid.TryParse(input, out targetId)) return;
@@ -30,8 +30,8 @@ public class Stop(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gam
         
         var player = this.Gamemode.GetPlayerById(this.OwnerId);
 
-        this.Gamemode.BroadcastMessage($"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on {this.Target.TelegramMention}!\n{this.Target.TelegramMention} has to stop now for {this.TimerDurationMinutes}");
-        this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on you. You have to stop now for {this.TimerDurationMinutes} minutes. If you are in public transport right now, exit on the next possible opportunty and stay there.");
+        await this.Gamemode.BroadcastMessage($"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on {this.Target.TelegramMention}!\n{this.Target.TelegramMention} has to stop now for {this.TimerDurationMinutes}");
+        await this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on you. You have to stop now for {this.TimerDurationMinutes} minutes. If you are in public transport right now, exit on the next possible opportunty and stay there.");
     }
 
     protected override void OnTimerFinished(object? sender, EventArgs e)

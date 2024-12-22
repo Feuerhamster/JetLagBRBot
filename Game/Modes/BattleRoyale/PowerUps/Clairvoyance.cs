@@ -13,14 +13,14 @@ public class Clairvoyance(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
     public override string Description { get; } =
         "Look what power ups other players have in their inventory and get notified for the next 20 minutes if someone activated a power up.";
     
-    public override void Use(string? input)
+    public override async Task Use(string? input)
     {
-        base.Use();
+        await base.Use();
         
         this.Gamemode.OnPowerUpUse += this.OnPowerUpUse;
         this.Gamemode.OnLandmarkClaim += this.OnLandmarkClaim;
         
-        this.Gamemode.SendPlayerMessage(this.OwnerId,
+        await this.Gamemode.SendPlayerMessage(this.OwnerId,
             $"\ud83c\udf1f Your {this.Name} PowerUp is now active for {this.TimerDurationMinutes} minutes!");
 
         var text = new StringBuilder();
@@ -40,7 +40,7 @@ public class Clairvoyance(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
             text.AppendLine();
         }
         
-        this.Gamemode.SendPlayerMessage(this.OwnerId, text.ToString());
+        await this.Gamemode.SendPlayerMessage(this.OwnerId, text.ToString());
     }
 
     protected override void OnTimerFinished(object? sender, EventArgs e)

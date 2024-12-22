@@ -25,6 +25,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
     private readonly BattleRoyaleGameData GameData;
 
+    // TODO: make all event handlers async
+    
     public event EventHandler<TagEventArgs> OnPlayerTag = delegate { }; 
     
     public event EventHandler<SuccessfulTagEventArgs> OnSuccessfulPlayerTag = delegate { };

@@ -14,9 +14,9 @@ public class Stealing(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp
 
     private Player<PlayerOrTeamStateData> Target { get; set; }
     
-    public override void Use(string? input)
+    public override async Task  Use(string? input)
     {
-        base.Use();
+        await base.Use();
 
         var targetId = Guid.Empty;
         if (!Guid.TryParse(input, out targetId)) return;
@@ -29,7 +29,7 @@ public class Stealing(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp
         
         if (targetAvailablePowerUps.Count == 0)
         {
-            this.Gamemode.SendPlayerMessage(this.OwnerId, $"\u26a0\ufe0f Invalid choice. This player has no power ups that could be stolen.");
+            await this.Gamemode.SendPlayerMessage(this.OwnerId, $"\u26a0\ufe0f Invalid choice. This player has no power ups that could be stolen.");
             return;
         }
         
@@ -42,14 +42,14 @@ public class Stealing(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp
         this.Target.PlayerGameStateData.Powerups.Remove(selectedPowerUp);
         owner.PlayerGameStateData.Powerups.Add(selectedPowerUp);
         
-        this.Gamemode.BroadcastMessage(
+        await this.Gamemode.BroadcastMessage(
             $"\ud83c\udf92 The player {owner.TelegramMention} has stolen a power up from {this.Target.TelegramMention}");
 
-        this.Gamemode.SendPlayerMessage(this.Target.Id,
+        await this.Gamemode.SendPlayerMessage(this.Target.Id,
             $"\ud83c\udf92 The player {owner.TelegramMention} has stolen the \"{selectedPowerUp.Name}\" power up from you.");
         
-        this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83c\udf92 You have sucessfully stolen the \"{selectedPowerUp.Name}\" power up from {this.Target.TelegramMention}");
+        await this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83c\udf92 You have sucessfully stolen the \"{selectedPowerUp.Name}\" power up from {this.Target.TelegramMention}");
         
-        this.Expire();
+        await this.Expire();
     }
 }

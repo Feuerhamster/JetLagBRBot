@@ -7,9 +7,9 @@ public class ExtraLife(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerU
     public override string Name { get; } = "Extra Life";
     public override string Description { get; } = "Instantly adds an extra life to your health points.";
 
-    public override void Use(string? input)
+    public override async Task  Use(string? input)
     {
-        base.Use();
+        await base.Use();
         
         var p = this.Gamemode.Players.Find(p => p.Id.Equals(this.OwnerId));
         if (p == null) return;
@@ -18,9 +18,9 @@ public class ExtraLife(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerU
         
         p.PlayerGameStateData.HealthPoints += 1;
 
-        this.Gamemode.SendPlayerMessage(p.Id,
+        await this.Gamemode.SendPlayerMessage(p.Id,
             $"\ud83d\udc9a You had **{oldHp}** health points, now you have **{p.PlayerGameStateData.HealthPoints}** health points!");
         
-        this.Expire();
+        await this.Expire();
     }
 }

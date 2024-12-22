@@ -12,17 +12,17 @@ public class DeactivateTracker(BattleRoyaleGamemode gamemode, Guid ownerId) : Ba
 
     protected override int? TimerDurationMinutes { get; } = 15;
 
-    public override void Use(string? input)
+    public override async Task Use(string? input)
     {
-        base.Use();
+        await base.Use();
 
-        this.Gamemode.SendPlayerMessage(this.OwnerId,
+        await this.Gamemode.SendPlayerMessage(this.OwnerId,
             $"\ud83c\udf1f Your {this.Name} PowerUp is now active for {this.TimerDurationMinutes} minutes!");
 
         var player = this.Gamemode.GetPlayerById(this.OwnerId);
         
         var mention = TgFormatting.UserMention(player.TelegramId, player.Nickname);
         
-        this.Gamemode.BroadcastMessage($"\ud83d\udce1 The player {mention} has used the {Name} PowerUp. They are now allowed to deactivate their live location sharing for {this.TimerDurationMinutes} minutes.");
+        await this.Gamemode.BroadcastMessage($"\ud83d\udce1 The player {mention} has used the {Name} PowerUp. They are now allowed to deactivate their live location sharing for {this.TimerDurationMinutes} minutes.");
     }
 }
