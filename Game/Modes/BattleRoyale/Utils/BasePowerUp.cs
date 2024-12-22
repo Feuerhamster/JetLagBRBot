@@ -66,7 +66,11 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
     /// </summary>
     public void Expire()
     {
-        // TODO: Stop timer if one exists
+        if (this.TimerDurationMinutes != null)
+        {
+            this.Timer.Stop();
+        }
+        
         this.Status = EPowerUpStatus.Expired;
         this.Gamemode.SendPlayerMessage(this.OwnerId, $"\u2b50 Your power up \"{this.Name}\" is now expired");
     }
