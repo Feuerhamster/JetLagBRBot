@@ -34,11 +34,11 @@ public class Stop(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gam
         await this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on you. You have to stop now for {this.TimerDurationMinutes} minutes. If you are in public transport right now, exit on the next possible opportunty and stay there.");
     }
 
-    protected override void OnTimerFinished()
+    protected override async Task OnTimerFinished()
     {
-        this.Gamemode.BroadcastMessage($"\u2705 {this.Target.TelegramMention} is free to move again!");
-        this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u2705 You are now allowed to move again!");
+        await this.Gamemode.BroadcastMessage($"\u2705 {this.Target.TelegramMention} is free to move again!");
+        await this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u2705 You are now allowed to move again!");
         
-        base.Expire();
+        await base.Expire();
     }
 }

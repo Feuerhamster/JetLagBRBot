@@ -33,6 +33,13 @@ public class Vampirism(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerU
         owner.PlayerGameStateData.HealthPoints += 1;
         this.currentTag = e.PlayerTag.TagId;
     }
+
+    private async Task PowerUpSuccessfull()
+    {
+        await this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83e\ude78 You now got +1 HP extra because of vampirism!");
+        
+        await this.Expire();
+    }
     
     private void OnSuccessfulPlayerTag(object? sender, SuccessfulTagEventArgs e)
     {
@@ -42,8 +49,6 @@ public class Vampirism(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerU
         
         if (!this.currentTag.Equals(e.PlayerTag.TagId)) return;
 
-        this.Gamemode.SendPlayerMessage(this.OwnerId, $"\ud83e\ude78 You now got +1 HP extra because of vampirism!");
-        
-        this.Expire();
+        this.PowerUpSuccessfull();
     }
 }

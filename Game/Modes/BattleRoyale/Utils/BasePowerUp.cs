@@ -59,7 +59,7 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
         }
     }
     
-    protected virtual void OnTimerFinished()
+    protected virtual async Task OnTimerFinished()
     {
         this.Expire();
     }

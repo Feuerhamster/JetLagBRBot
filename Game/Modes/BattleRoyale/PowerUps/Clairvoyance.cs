@@ -43,11 +43,11 @@ public class Clairvoyance(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
         await this.Gamemode.SendPlayerMessage(this.OwnerId, text.ToString());
     }
 
-    protected override void OnTimerFinished()
+    protected override async Task OnTimerFinished()
     {
         this.Gamemode.OnPowerUpUse -= this.OnPowerUpUse;
         this.Gamemode.OnLandmarkClaim -= this.OnLandmarkClaim;
-        this.Expire();
+        await this.Expire();
     }
 
     private void OnPowerUpUse(object? sender, PowerUpUseEventArgs e)

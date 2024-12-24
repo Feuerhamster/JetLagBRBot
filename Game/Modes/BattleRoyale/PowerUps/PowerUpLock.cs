@@ -12,7 +12,7 @@ public class PowerUpLock(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowe
         "No one except you can activate power ups for the next 20 minutes. PowerUps who are already active are unaffected.";
     
     
-    public override async Task  Use(string? input)
+    public override async Task Use(string? input)
     {
         await base.Use();
         
@@ -24,12 +24,12 @@ public class PowerUpLock(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowe
             $"\ud83c\udf1f Your {this.Name} PowerUp is now active for {this.TimerDurationMinutes} minutes!");
     }
 
-    protected override void OnTimerFinished()
+    protected override async Task OnTimerFinished()
     {
         this.Gamemode.OnPowerUpUse -= this.OnPowerUpUse;
-        this.Expire();
+        await this.Expire();
         
-        this.Gamemode.BroadcastMessage(
+        await this.Gamemode.BroadcastMessage(
             $"\u2705 PowerUps can now be activated again");
     }
 

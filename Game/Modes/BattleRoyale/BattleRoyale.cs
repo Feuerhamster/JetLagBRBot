@@ -195,7 +195,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         if (victim.PlayerGameStateData.HealthPoints == 0)
         {
-            this.SendPlayerMessage(tagger.Id, "\u26a0\ufe0f Tag failed. Targeted player already dead.");
+            await this.SendPlayerMessage(tagger.Id, "\u26a0\ufe0f Tag failed. Targeted player already dead.");
             return;
         }
         
@@ -391,7 +391,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         await this.BroadcastMessage($"\ud83c\udfc6 The player {player.TelegramMention} has won the game!");
         
-        this.PrintScoreboard();
+        await this.PrintScoreboard();
     }
     
     /// <summary>
@@ -438,7 +438,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         return hpCandidates.OrderByDescending(p => p.PlayerGameStateData.Powerups.Count).First().Id;
     }
 
-    public void PrintScoreboard()
+    public async Task PrintScoreboard()
     {
         var text = new StringBuilder();
 
@@ -456,6 +456,6 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             text.AppendLine("");
         }
         
-        this.BroadcastMessage(text.ToString());
+        await this.BroadcastMessage(text.ToString());
     }
 }
