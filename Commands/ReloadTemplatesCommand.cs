@@ -11,6 +11,13 @@ public class ReloadTemplatesCommand(IGameTemplateService templateService, ITeleg
 {
     public override string Command { get; } = "reload_templates";
     public override string Description { get; } = "Reload all game template files";
+
+    public override ICustomBotCommandConstraint[] Constraints { get; } =
+    [
+        new ChatTypeConstraint(ChatType.Group),
+        new OnlyGroupAdminConstraint()
+    ];
+
     public override async Task Execute(Message msg, UpdateType type)
     {
         List<string> reloadLog = templateService.ReloadTemplates();

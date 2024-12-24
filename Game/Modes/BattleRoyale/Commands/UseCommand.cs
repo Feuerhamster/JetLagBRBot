@@ -15,7 +15,8 @@ public class UseCommand(ITelegramBotService bot, IGameManagerService gameManager
     public override ICustomBotCommandConstraint[] Constraints { get; } =
     [
         new OnlyPlayersWhoJoinedConstraint(),
-        new OnlyGameModeConstraint(BattleRoyaleGamemode.GameModeName)
+        new OnlyGameModeConstraint(BattleRoyaleGamemode.GameModeName),
+        new ChatTypeConstraint(ChatType.Private)
     ];
 
     public async override Task Execute(Message msg, UpdateType type)
