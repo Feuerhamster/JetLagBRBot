@@ -29,6 +29,11 @@ public class ManagedTimer
         this._timer.Elapsed += this.Tick;
     }
 
+    public static bool VerifyTimeIsOver(DateTime originalTime, TimeSpan duration)
+    {
+        return DateTime.Now >= originalTime.Add(duration);
+    }
+
     public void Start()
     {
         this._timer.Start();

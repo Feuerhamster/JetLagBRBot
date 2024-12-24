@@ -23,7 +23,7 @@ public class Immunity(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp
             $"\ud83c\udf1f Your {this.Name} PowerUp is now active for {this.TimerDurationMinutes} minutes!");
     }
 
-    protected override void OnTimerFinished(object? sender, EventArgs e)
+    protected override void OnTimerFinished()
     {
         this.Gamemode.OnPlayerTag -= this.OnPlayerTag;
         this.Expire();

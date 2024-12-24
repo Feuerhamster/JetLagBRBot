@@ -40,27 +40,39 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
     /// </summary>
     protected virtual int? TimerDurationMinutes { get; } = null;
     
+    private bool IsTimedPowerUp => this.TimerDurationMinutes != null && this.TimerDurationMinutes.HasValue;
+    
+    public DateTime UsageActivationTime { get; private set; } = DateTime.MinValue;
+    
     public virtual EPowerUpInput Input { get; } = EPowerUpInput.None;
-
-    // TODO: remove individual timers and implement this into the main game timer
-    protected ManagedTimer Timer { get; private set; } = new(new TimeSpan(0,0, 0));
     
     public virtual async Task Use(string? input = null)
     {
         this.Status = EPowerUpStatus.Active;
 
+        this.UsageActivationTime = DateTime.Now;
+        
         // if duration is set, power up wants to use the timer
-        if (this.TimerDurationMinutes != null)
+        if (this.IsTimedPowerUp)
         {
-            this.Timer.Duration = new TimeSpan(0, (int)this.TimerDurationMinutes, 0);
-            this.Timer.OnFinished += this.OnTimerFinished;
-            this.Timer.Start();
+            this.Gamemode.GameTimer.OnTick += this.Tick;
         }
     }
     
-    protected virtual void OnTimerFinished(object? sender, EventArgs e)
+    protected virtual void OnTimerFinished()
     {
         this.Expire();
+    }
+
+    private void Tick(object? sender, EventArgs e)
+    {
+        if (!this.IsTimedPowerUp || this.Status != EPowerUpStatus.Active) return;
+
+        var duration = new TimeSpan(0, 0, (int)this.TimerDurationMinutes, 0);
+        if (ManagedTimer.VerifyTimeIsOver(this.UsageActivationTime, duration))
+        {
+            this.OnTimerFinished();
+        }
     }
     
     /// <summary>
@@ -68,9 +80,9 @@ public abstract class BasePowerUp(BattleRoyaleGamemode gamemode, Guid ownerId)
     /// </summary>
     public async Task Expire()
     {
-        if (this.TimerDurationMinutes != null)
+        if (this.IsTimedPowerUp)
         {
-            this.Timer.Stop();
+            this.Gamemode.GameTimer.OnTick -= this.Tick;
         }
         
         this.Status = EPowerUpStatus.Expired;

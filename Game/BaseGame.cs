@@ -61,8 +61,8 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     {
         if (this.Game.Status != EGameStatus.ProtectionPhase) return;
         if (this.GameTemplate.Config.ProtectionPhase is not TimeSpan protectionPhase) return;
-        
-        if (DateTime.Now >= this.GameTimer.TimeStarted.Add(protectionPhase))
+
+        if (ManagedTimer.VerifyTimeIsOver(this.GameTimer.TimeStarted, protectionPhase))
         {
             await this.BroadcastMessage("\u2622\ufe0f Protection phase is over!");
             this.Game.Status = EGameStatus.Running;

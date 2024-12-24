@@ -24,7 +24,7 @@ public class PowerUpLock(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowe
             $"\ud83c\udf1f Your {this.Name} PowerUp is now active for {this.TimerDurationMinutes} minutes!");
     }
 
-    protected override void OnTimerFinished(object? sender, EventArgs e)
+    protected override void OnTimerFinished()
     {
         this.Gamemode.OnPowerUpUse -= this.OnPowerUpUse;
         this.Expire();

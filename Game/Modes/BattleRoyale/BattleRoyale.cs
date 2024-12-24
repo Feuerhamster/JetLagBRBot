@@ -14,8 +14,7 @@ namespace JetLagBRBot.Game.Modes.BattleRoyale;
 public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateData, PlayerOrTeamStateData>
 {
     public const string GameModeName = "BattleRoyale";
-
-    private readonly TimeSpan TimeBetweenDrops;
+    
     
     private readonly ITelegramBotService _telegramBot;
     
@@ -39,7 +38,6 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     
     public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, long telegramGroupId, IServiceProvider services) : base(template, telegramGroupId, services)
     {
-        this.TimeBetweenDrops = data.TimeBetweenDrops;
         this._services = services;
         this._database = services.GetRequiredService<IDatabaseService>();
         
@@ -78,10 +76,10 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         if (this.Game.Status != EGameStatus.Running) return;
 
         Console.WriteLine($"Checking for next landmark ({ DateTime.Now.ToString("HH:mm:ss") })...");
-        Console.WriteLine($"New Landmark should drop at {this.Game.GameStateData.LastTimeDropped.Add(this.TimeBetweenDrops)}");
+        Console.WriteLine($"New Landmark should drop at {this.Game.GameStateData.LastTimeDropped.Add(this.GameData.TimeBetweenDrops)}");
         
         if (
-            DateTime.Now > this.Game.GameStateData.LastTimeDropped.Add(this.TimeBetweenDrops) ||
+            ManagedTimer.VerifyTimeIsOver(this.Game.GameStateData.LastTimeDropped, this.GameData.TimeBetweenDrops) ||
             this.Game.GameStateData.CurrentActiveLandmark == null
         ) {
             Console.WriteLine("Dropping new landmark...");
