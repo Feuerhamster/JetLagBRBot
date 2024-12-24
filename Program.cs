@@ -1,7 +1,11 @@
 using JetLagBRBot.Game;
 using JetLagBRBot.Services;
+using Microsoft.Extensions.Logging.Console;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole(c => c.TimestampFormat = "[HH:mm:ss] ");
 
 // Add services to the container.
 
@@ -12,7 +16,6 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<ITelegramBotService, TelegramBotService>();
 builder.Services.AddSingleton<IGameTemplateService, GameTemplateService>();
-builder.Services.AddSingleton<IGameLogService, GameLogService>();
 builder.Services.AddSingleton<IGameManagerService, GameManagerService>();
 builder.Services.AddSingleton<ICommandService, CommandService>();
 builder.Services.AddSingleton<IDatabaseService, DatabaseService>();
@@ -22,7 +25,7 @@ var app = builder.Build();
 // init game templates
 IGameTemplateService gameTemplateService = app.Services.GetService<IGameTemplateService>();
 var templateLog = gameTemplateService.ReloadTemplates();
-Console.WriteLine(String.Join("\n", templateLog.ToArray()));
+app.Logger.LogInformation(String.Join("\n", templateLog.ToArray()));
 
 app.Services.GetService<ICommandService>();
 
@@ -33,7 +36,6 @@ app.Services.GetService<ITelegramBotService>();
 IGameManagerService gameManagerService = app.Services.GetService<IGameManagerService>();
 
 gameManagerService.LoadCommands();
-
 
 app.Services.GetService<IDatabaseService>();
 

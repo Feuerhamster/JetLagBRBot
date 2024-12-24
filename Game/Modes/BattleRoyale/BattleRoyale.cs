@@ -18,7 +18,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     
     private readonly ITelegramBotService _telegramBot;
     
-    private readonly IServiceProvider _services;
+    private readonly ILogger<BattleRoyaleGamemode> _logger;
     
     private readonly IDatabaseService _database;
 
@@ -38,8 +38,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     
     public BattleRoyaleGamemode(GameTemplate template, BattleRoyaleGameData data, long telegramGroupId, IServiceProvider services) : base(template, telegramGroupId, services)
     {
-        this._services = services;
         this._database = services.GetRequiredService<IDatabaseService>();
+        this._logger = services.GetRequiredService<ILogger<BattleRoyaleGamemode>>();
         
         this.Game.GameStateData.Landmarks = new(data.Landmarks);
         
@@ -75,14 +75,10 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     {
         if (this.Game.Status != EGameStatus.Running) return;
 
-        Console.WriteLine($"Checking for next landmark ({ DateTime.Now.ToString("HH:mm:ss") })...");
-        Console.WriteLine($"New Landmark should drop at {this.Game.GameStateData.LastTimeDropped.Add(this.GameData.TimeBetweenDrops)}");
-        
         if (
             ManagedTimer.VerifyTimeIsOver(this.Game.GameStateData.LastTimeDropped, this.GameData.TimeBetweenDrops) ||
             this.Game.GameStateData.CurrentActiveLandmark == null
         ) {
-            Console.WriteLine("Dropping new landmark...");
             this.NewLandmark();
         }
     }
@@ -139,7 +135,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         if (newLandmark == null)
         {
-            Console.WriteLine("WARNING: No new landmark found!");
+            this._logger.LogWarning("No new landmark was found!");
             return;
         }
         
@@ -162,7 +158,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         message.AppendLine($"Location: **[{newLandmark.Coordinates[0]}, {newLandmark.Coordinates[1]}]({locationLink})**");
 
         await this.BroadcastMessage(message.ToString());
-
+        
         var fileName = Path.GetFileName(newLandmark.ImagePath);
 
         var cachedImg = this._database.GetImageCache(fileName);

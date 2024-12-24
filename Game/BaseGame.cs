@@ -28,6 +28,8 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     
     private readonly ITelegramBotService _telegramBot; 
     
+    private readonly ILogger _logger;
+    
     public Game<TGameState> Game { get; private set; }
 
     public ManagedTimer GameTimer { get; private set; }
@@ -40,6 +42,8 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     
     protected BaseGame(GameTemplate template, long telegramGroupId, IServiceProvider serviceProvider)
     {
+        this._logger = serviceProvider.GetService<ILogger<IBaseGame>>();
+        
         this._telegramBot = serviceProvider.GetService<ITelegramBotService>();
         this.Game = new Game<TGameState>(template.Config.Name, telegramGroupId);
         this.GameTemplate = template;
@@ -111,7 +115,7 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            this._logger.LogError(e, e.Message);
             return;
         }
 
@@ -236,7 +240,14 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     public async Task BroadcastMessage(string message, IReplyMarkup replyMarkup = null)
     {
         message = TgFormatting.MarkdownEscape(message);
-        await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
+        try
+        {
+            await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
+        }
+        catch (Exception e)
+        {
+            this._logger.LogError(e, e.Message);
+        }
     }
     
     /// <summary>

@@ -20,10 +20,12 @@ public class TelegramBotService : ITelegramBotService
     public event EventHandler<Message> OnUserLocation; 
     
     private readonly ICommandService _commandService;
+    private readonly ILogger<TelegramBotService> _logger;
     
-    public TelegramBotService(IConfiguration config, ICommandService commandService)
+    public TelegramBotService(IConfiguration config, ICommandService commandService, ILogger<TelegramBotService> logger)
     {
         this._commandService = commandService;
+        this._logger = logger;
         
         string? token = config.GetValue<string>("TG_API_KEY");
 
@@ -36,8 +38,8 @@ public class TelegramBotService : ITelegramBotService
 
         User user = this.Client.GetMeAsync().Result;
         
-        Console.WriteLine("Telegram bot loaded");
-        Console.WriteLine("id: " + user.Id);
+        this._logger.LogInformation("Loaded");
+        this._logger.LogInformation("id: " + user.Id);
         
         this.Client.OnMessage += this.OnMessage;
         this.Client.OnUpdate += this.OnUpdate;
@@ -47,7 +49,7 @@ public class TelegramBotService : ITelegramBotService
 
     private Task OnError(Exception e, HandleErrorSource h)
     {
-        Console.WriteLine(e.Message);
+        this._logger.LogError(e, e.Message);
         return Task.CompletedTask;
     }
     
