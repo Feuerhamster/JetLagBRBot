@@ -127,7 +127,6 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         var rand = new Random();
         
         // select new drop
-        // TODO: please fix - Landmark list sometimes empty on game start or during game
         var newLandmark = this.Game.GameStateData.Landmarks
             .Where(l => (this.Game.GameStateData.CurrentActiveLandmark == null || l.District != this.Game.GameStateData.CurrentActiveLandmark.District) || this.Game.GameStateData.Landmarks.All(c => c.District == l.District))
             .OrderBy(l => rand.Next())
@@ -147,8 +146,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         StringBuilder message = new StringBuilder();
         message.AppendLine("\ud83d\udccc **New Powerup available at Landmark**");
         message.AppendLine("");
-        message.AppendLine($"Name: **{newLandmark.Name}**");
-        message.AppendLine($"District: **{newLandmark.District}**");
+        message.AppendLine($"Name: **{TgFormatting.MarkdownEscape(newLandmark.Name)}**");
+        message.AppendLine($"District: **{TgFormatting.MarkdownEscape(newLandmark.District)}**");
 
         var lat = newLandmark.Coordinates[0].ToString(CultureInfo.InvariantCulture);
         var lng = newLandmark.Coordinates[1].ToString(CultureInfo.InvariantCulture);
@@ -343,7 +342,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         // expire the active power up because the player can have only one power up usage at a time
         foreach (var activePowerUp in activePowerUps)
-        {
+      
+  {
             activePowerUp.Expire();
         }
         
