@@ -22,15 +22,15 @@ public static class PowerUpUtils
 {
     private static WeightedItem<EPowerUp>[] WeightedPowerUps = [
         new(EPowerUp.Immunity, 100),
-        new(EPowerUp.DeactivateTracker, 150),
+        new(EPowerUp.DeactivateTracker, 120),
         new(EPowerUp.PowerUpLock, 100),
-        new(EPowerUp.Stop, 150),
+        new(EPowerUp.Stop, 120),
         new(EPowerUp.DoubleDamage, 100),
         new(EPowerUp.InstantHit, 100),
-        new(EPowerUp.Vampirism, 150),
+        new(EPowerUp.Vampirism, 120),
         new(EPowerUp.ExtraLife, 100),
-        new(EPowerUp.Stealing, 150),
-        new(EPowerUp.Clairvoyance, 150),
+        new(EPowerUp.Stealing, 120),
+        new(EPowerUp.Clairvoyance, 120),
     ];
 
     
