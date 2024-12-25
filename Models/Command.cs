@@ -25,7 +25,7 @@ public class ChatTypeConstraint(ChatType chatType) : ICustomBotCommandConstraint
         {
             await botService.Client.SendMessage(
                 msg.Chat.Id,
-                "A new game can only be created within in a group"
+                "\u26a0\ufe0f This command cannot be executed in this kind of chat"
             );
             return false;
         }

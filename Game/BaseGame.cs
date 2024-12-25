@@ -164,7 +164,7 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
         Player<TPlayerGameState> p = new(nickname, telegramId);
         this.Players.Add(p);
 
-        this.BroadcastMessage($"{p.Nickname} joined the game");
+        this.BroadcastMessage($"{p.TelegramMention} joined the game", escape: false);
         
         return true;
     }
@@ -182,7 +182,7 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
         
         this.Players.Remove(p);
         
-        this.BroadcastMessage($"{p.Nickname} left the game");
+        this.BroadcastMessage($"{p.TelegramMention} left the game", escape : false);
         
         return true;
     }
@@ -237,16 +237,20 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     /// Sends a message into the telegram group where the game takes place
     /// </summary>
     /// <param name="message">text message for the group</param>
-    public async Task BroadcastMessage(string message, IReplyMarkup replyMarkup = null)
+    public async Task BroadcastMessage(string message, IReplyMarkup replyMarkup = null, bool md = true, bool escape = true)
     {
-        message = TgFormatting.MarkdownEscape(message);
+        if (escape)
+        {
+            message = TgFormatting.MarkdownEscape(message);
+        }
+        
         try
         {
-            await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
+            await this._telegramBot.Client.SendMessage(this.Game.TelegramGroupId, message, replyMarkup: replyMarkup, parseMode: md ? ParseMode.MarkdownV2 : ParseMode.None);
         }
         catch (Exception e)
         {
-            this._logger.LogError(e, e.Message);
+            this._logger.LogError(e, message);
         }
     }
     
@@ -254,12 +258,23 @@ public class BaseGame<TGameState, TTeamGameState, TPlayerGameState> : IBaseGame 
     /// Sends a message to the player
     /// </summary>
     /// <param name="message">text message for the player</param>
-    public async Task SendPlayerMessage(Guid playerId, string message, IReplyMarkup replyMarkup = null)
+    public async Task SendPlayerMessage(Guid playerId, string message, IReplyMarkup replyMarkup = null, bool md = true, bool escape = true)
     {
         var p = this.GetPlayerById(playerId);
-        
-        message = TgFormatting.MarkdownEscape(message);
-        await this._telegramBot.Client.SendMessage(p.TelegramId, message, replyMarkup: replyMarkup, parseMode: ParseMode.MarkdownV2);
+
+        if (escape)
+        {
+            message = TgFormatting.MarkdownEscape(message);
+        }
+
+        try
+        {
+            await this._telegramBot.Client.SendMessage(p.TelegramId, message, replyMarkup: replyMarkup,
+                parseMode: md ? ParseMode.MarkdownV2 : ParseMode.None);
+        } catch (Exception e)
+        {
+            this._logger.LogError(e, message);
+        }
     }
 
     public Player<TPlayerGameState>? GetPlayerById(Guid playerId)

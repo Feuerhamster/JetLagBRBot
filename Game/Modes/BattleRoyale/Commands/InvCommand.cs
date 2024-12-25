@@ -37,22 +37,22 @@ public class InvCommand(ITelegramBotService bot, IGameManagerService gameManager
         
         text.AppendLine($"\ud83d\udc9a Health Points: {player.PlayerGameStateData.HealthPoints}\n");
 
-        text.AppendLine("\ud83c\udf92 **Inventory:**\n");
+        text.AppendLine("\ud83c\udf92 *Inventory:*\n");
 
         var invPowerUps = player.PlayerGameStateData.Powerups.Where(p => p.Status == EPowerUpStatus.Inactive);
         
         foreach (var powerUp in invPowerUps)
         {
-            text.AppendLine($"**{powerUp.Name}**: {powerUp.Description}\n");
+            text.AppendLine($"*{powerUp.Name}*: {powerUp.Description}\n");
         }
         
         var activePowerUps = player.PlayerGameStateData.Powerups.Where(p => p.Status == EPowerUpStatus.Active);
 
-        text.AppendLine("\ud83c\udf1f **Active PowerUps:**\n");
+        text.AppendLine("\ud83c\udf1f *Active PowerUps:*\n");
         
         foreach (var powerUp in activePowerUps)
         {
-            text.AppendLine($"**{powerUp.Name}**: {powerUp.Description}\n");
+            text.AppendLine($"*{powerUp.Name}*: {powerUp.Description}\n");
         }
         
         currentGame.SendPlayerMessage(player.Id, text.ToString());

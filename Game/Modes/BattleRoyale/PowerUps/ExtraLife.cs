@@ -19,7 +19,7 @@ public class ExtraLife(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerU
         p.PlayerGameStateData.HealthPoints += 1;
 
         await this.Gamemode.SendPlayerMessage(p.Id,
-            $"\ud83d\udc9a You had **{oldHp}** health points, now you have **{p.PlayerGameStateData.HealthPoints}** health points!");
+            $"\ud83d\udc9a You had *{oldHp}* health points, now you have *{p.PlayerGameStateData.HealthPoints}* health points!");
         
         await this.Expire();
     }

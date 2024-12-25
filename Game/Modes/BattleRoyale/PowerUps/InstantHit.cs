@@ -37,10 +37,10 @@ public class InstantHit(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePower
         var owner = this.Gamemode.GetPlayerById(this.OwnerId);
 
         await this.Gamemode.BroadcastMessage(
-            $"\ud83d\udca3 The player {owner.TelegramMention} used the \"Instant hit\" power up to remove 1 hp from {this.Target.TelegramMention}");
+            $"\ud83d\udca3 The player {owner.TelegramMention} used the \"Instant hit\" power up to remove 1 hp from {this.Target.TelegramMention}", escape: false);
 
         await this.Gamemode.SendPlayerMessage(this.Target.Id,
-            $"\ud83d\udca3 You have been instantly hit by {owner.TelegramMention} and lost 1 health point.");
+            $"\ud83d\udca3 You have been instantly hit by {owner.TelegramMention} and lost 1 health point", escape: false);
         
         await this.Expire();
     }

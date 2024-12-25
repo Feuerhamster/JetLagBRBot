@@ -103,7 +103,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             {
                 player.PlayerGameStateData.TagStatus = EPlayerTagStatus.Protected;
                 await this.SendPlayerMessage(player.Id, $"\u2744\ufe0f You are not frozen anymore and are allowed to move again.");
-                await this.BroadcastMessage($"\u2744\ufe0f {player.TelegramMention} is now allowed to move again.");
+                await this.BroadcastMessage($"\u2744\ufe0f {player.TelegramMention} is now allowed to move again", escape: false);
                 continue;
             }
             
@@ -113,7 +113,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             {
                 player.PlayerGameStateData.TagStatus = EPlayerTagStatus.Default;
                 await this.SendPlayerMessage(player.Id, $"\ud83d\udee1\ufe0f You are not protected anymore and you can now be tagged again.");
-                await this.BroadcastMessage($"\ud83d\udee1\ufe0f {player.TelegramMention} can now be tagged again.");
+                await this.BroadcastMessage($"\ud83d\udee1\ufe0f {player.TelegramMention} can now be tagged again", escape: false);
                 continue;
             }
         }
@@ -144,19 +144,19 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         this.Game.GameStateData.LastTimeDropped = DateTime.Now;
 
         StringBuilder message = new StringBuilder();
-        message.AppendLine("\ud83d\udccc **New Powerup available at Landmark**");
+        message.AppendLine("\ud83d\udccc *New Powerup available at Landmark*");
         message.AppendLine("");
-        message.AppendLine($"Name: **{TgFormatting.MarkdownEscape(newLandmark.Name)}**");
-        message.AppendLine($"District: **{TgFormatting.MarkdownEscape(newLandmark.District)}**");
+        message.AppendLine($"Name: *{TgFormatting.MarkdownEscape(newLandmark.Name)}*");
+        message.AppendLine($"District: *{TgFormatting.MarkdownEscape(newLandmark.District)}*");
 
         var lat = newLandmark.Coordinates[0].ToString(CultureInfo.InvariantCulture);
         var lng = newLandmark.Coordinates[1].ToString(CultureInfo.InvariantCulture);
         
         string locationLink = $"https://www.google.com/maps/place/{lat},{lng}";
         
-        message.AppendLine($"Location: **[{newLandmark.Coordinates[0]}, {newLandmark.Coordinates[1]}]({locationLink})**");
+        message.AppendLine($"Location: *[{newLandmark.Coordinates[0]}, {newLandmark.Coordinates[1]}]({locationLink})*");
 
-        await this.BroadcastMessage(message.ToString());
+        await this.BroadcastMessage(message.ToString(), escape: false);
         
         var fileName = Path.GetFileName(newLandmark.ImagePath);
 
@@ -208,16 +208,16 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             await this.SendPlayerMessage(taggerId,
                 "\u26d4 You are currently not allowed to tag others since you were recently tagged and are in freeze");
             await this.BroadcastMessage(
-                $"\u26d4 The tag from {tagger.TelegramMention} on {victim.TelegramMention} is invalid since {tagger.TelegramMention} is in freeze from a recent tag.");
+                $"\u26d4 The tag from {tagger.TelegramMention} on {victim.TelegramMention} is invalid since {tagger.TelegramMention} is in freeze from a recent tag", escape: false);
             return;
         }
 
         if (victim.PlayerGameStateData.TagStatus == EPlayerTagStatus.Protected)
         {
             await this.SendPlayerMessage(taggerId,
-                $"\u26d4 You are currently not allowed to tag {victim.TelegramMention} because they were already recently tagged.");
+                $"\u26d4 You are currently not allowed to tag {victim.TelegramMention} because they were already recently tagged", escape: false);
             await this.BroadcastMessage(
-                $"\u26d4 The tag from {tagger.TelegramMention} on {victim.TelegramMention} is invalid since {victim.TelegramMention} was already recently tagged.");
+                $"\u26d4 The tag from {tagger.TelegramMention} on {victim.TelegramMention} is invalid since {victim.TelegramMention} was already recently tagged", escape: false);
             return;
         }
         
@@ -228,7 +228,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         if (eventArgs.Cancel)
         {
             await this.BroadcastMessage(
-                $"\u274e The tag of {tagger.TelegramMention} on {victim.TelegramMention} was canceled due to a power up of them!");
+                $"\u274e The tag of {tagger.TelegramMention} on {victim.TelegramMention} was canceled due to a power up of them", escape: false);
             return;
         }
         
@@ -242,9 +242,9 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         // protection
         var frozenDate = DateTime.Now.Add((TimeSpan)this.GameData.TagFreeze).ToString("HH:mm:ss");
         var protectedDate = DateTime.Now.Add((TimeSpan)this.GameData.AfterTagProtection).ToString("HH:mm:ss");
-        await this.SendPlayerMessage(victim.Id, $"\ud83d\udee1\ufe0f {victim.TelegramMention} You are now frozen until {frozenDate} and you shall not move and cannot tag others.\n You are also protected until {protectedDate} and can't be tagged by others.");
+        await this.SendPlayerMessage(victim.Id, $"\ud83d\udee1\ufe0f You are now frozen until {frozenDate} and you shall not move and cannot tag others.\n You are also protected until {protectedDate} and can't be tagged by others.");
         
-        await this.BroadcastMessage($"\ud83d\udea9 Player {tagger.TelegramMention} successfully tagged {victim.TelegramMention}!");
+        await this.BroadcastMessage($"\ud83d\udea9 Player {tagger.TelegramMention} successfully tagged {victim.TelegramMention}", escape: false);
     }
 
     /// <summary>
@@ -296,7 +296,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         lm.Claimed = true;
         
-        await this.BroadcastMessage($"\ud83c\udf1f {claimer.TelegramMention} claimed the PowerUp at the current Landmark \"{lm.Name}\"");
+        await this.BroadcastMessage($"\ud83c\udf1f {claimer.TelegramMention} claimed the PowerUp at the current Landmark \"{TgFormatting.MarkdownEscape(lm.Name)}\"", escape: false);
 
         await this.SendPlayerMessage(claimerId, $"\ud83c\udf1f You have sucessfully claimed the Landmark \"{lm.Name}\" obtained the \"{powerUp.Name}\" power up");
         
@@ -370,7 +370,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         if (victim.PlayerGameStateData.HealthPoints == 0)
         {
-            this.BroadcastMessage($"\ud83d\udc80 The player {victim.TelegramMention} is now dead");
+            this.BroadcastMessage($"\ud83d\udc80 The player {victim.TelegramMention} is now dead", escape: false);
         }
         
         var aliveCount = this.Players.Count(p => p.PlayerGameStateData.HealthPoints > 0);
@@ -389,7 +389,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         var player = this.GetPlayerById(winner);
         
-        await this.BroadcastMessage($"\ud83c\udfc6 The player {player.TelegramMention} has won the game!");
+        await this.BroadcastMessage($"\ud83c\udfc6 The player {player.TelegramMention} has won the game", escape: false);
         
         await this.PrintScoreboard();
     }
@@ -442,20 +442,20 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     {
         var text = new StringBuilder();
 
-        text.AppendLine("**Final player stats:**\n");
+        text.AppendLine("*Final player stats:*\n");
 
         foreach (var player in this.Players)
         {
-            text.AppendLine($"**{player.TelegramMention}:**");
+            text.AppendLine($"*{player.TelegramMention}:*");
 
-            text.AppendLine($"\ud83d\udc9a Health points: **{player.PlayerGameStateData.HealthPoints}**");
-            text.AppendLine($"\ud83c\udf1f Power ups: **{player.PlayerGameStateData.Powerups.Count}**");
+            text.AppendLine($"\ud83d\udc9a Health points\\: *{player.PlayerGameStateData.HealthPoints}*");
+            text.AppendLine($"\ud83c\udf1f Power ups\\: *{player.PlayerGameStateData.Powerups.Count}*");
             
             var tags = this.Game.GameStateData.PlayerTags.Count(t => t.TaggerId.Equals(player.Id));
-            text.AppendLine($"\ud83d\udea9 Tags: **{tags}**");
+            text.AppendLine($"\ud83d\udea9 Tags\\: *{tags}*");
             text.AppendLine("");
         }
         
-        await this.BroadcastMessage(text.ToString());
+        await this.BroadcastMessage(text.ToString(), escape: false);
     }
 }

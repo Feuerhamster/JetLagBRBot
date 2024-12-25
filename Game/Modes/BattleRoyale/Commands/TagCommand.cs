@@ -42,7 +42,7 @@ public class TagCommand(ITelegramBotService bot, IGameManagerService gameManager
         
         bot.Client.SendMessage(
             msg.Chat.Id,
-            @"Please select the player you wanna tag\.\n**You have to post a photo of them on which they can be identified into the game chat group\!**",
+            @"Please select the player you wanna tag\. *You have to post a photo of them on which they can be identified into the game chat group\!*",
             replyMarkup: keyboard.GetKeyboardMarkup(),
             parseMode: ParseMode.MarkdownV2
         );

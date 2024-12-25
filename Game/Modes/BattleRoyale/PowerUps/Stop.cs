@@ -30,13 +30,13 @@ public class Stop(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp(gam
         
         var player = this.Gamemode.GetPlayerById(this.OwnerId);
 
-        await this.Gamemode.BroadcastMessage($"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on {this.Target.TelegramMention}!\n{this.Target.TelegramMention} has to stop now for {this.TimerDurationMinutes}");
-        await this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on you. You have to stop now for {this.TimerDurationMinutes} minutes. If you are in public transport right now, exit on the next possible opportunty and stay there.");
+        await this.Gamemode.BroadcastMessage($"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on {this.Target.TelegramMention}\\!\n{this.Target.TelegramMention} has to stop now for {this.TimerDurationMinutes}", escape: false);
+        await this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u26d4 {player.TelegramMention} has used the \"Stop\" power up on you\\. You have to stop now for {this.TimerDurationMinutes} minutes\\. If you are in public transport right now, exit on the next possible opportunty and stay there\\.", escape: false);
     }
 
     protected override async Task OnTimerFinished()
     {
-        await this.Gamemode.BroadcastMessage($"\u2705 {this.Target.TelegramMention} is free to move again!");
+        await this.Gamemode.BroadcastMessage($"\u2705 {this.Target.TelegramMention} is free to move again", escape: false);
         await this.Gamemode.SendPlayerMessage(this.Target.Id, $"\u2705 You are now allowed to move again!");
         
         await base.Expire();

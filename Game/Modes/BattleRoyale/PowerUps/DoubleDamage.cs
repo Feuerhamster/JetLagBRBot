@@ -20,7 +20,7 @@ public class DoubleDamage(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
         this.Gamemode.OnSuccessfulPlayerTag += this.OnSuccessfulPlayerTag;
 
         await this.Gamemode.SendPlayerMessage(this.OwnerId,
-            $"\ud83c\udf1f Your {this.Name} PowerUp is now active until used");
+            $"\ud83c\udf1f Your \"{this.Name}\" PowerUp is now active until used");
     }
     
     private void OnPlayerTag(object? sender, TagEventArgs e)

@@ -21,7 +21,7 @@ public class PowerUpLock(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowe
         await this.Gamemode.BroadcastMessage(
             $"\ud83d\udeab For the next {this.TimerDurationMinutes} minutes, no one can activate power ups. Already active power ups are unaffected.");
         await this.Gamemode.SendPlayerMessage(this.OwnerId,
-            $"\ud83c\udf1f Your {this.Name} PowerUp is now active for {this.TimerDurationMinutes} minutes!");
+            $"\ud83c\udf1f Your \"{this.Name}\" PowerUp is now active for {this.TimerDurationMinutes} minutes");
     }
 
     protected override async Task OnTimerFinished()
