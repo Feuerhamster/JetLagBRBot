@@ -20,7 +20,7 @@ public enum EPowerUp
 
 public static class PowerUpUtils
 {
-    private static WeightedItem<EPowerUp>[] WeightedPowerUps = [
+    public static WeightedItem<EPowerUp>[] WeightedPowerUps = [
         new(EPowerUp.Immunity, 100),
         new(EPowerUp.DeactivateTracker, 120),
         new(EPowerUp.PowerUpLock, 100),
@@ -84,12 +84,5 @@ public static class PowerUpUtils
             }
         }
     }
-
-    public static EPowerUp RandomPowerUp()
-    {
-        // TODO: Fix and improve random selection algorithm (currently not really balancend: higher weigted power ups are too often)
-        var selected = WeightedRandomSelector.SelectRandomItem(WeightedPowerUps);
-        return selected.Item;
-    } 
 }
 

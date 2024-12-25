@@ -23,6 +23,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     private readonly IDatabaseService _database;
 
     private readonly BattleRoyaleGameData GameData;
+    
+    private readonly WeightedAndBalancedRandomSelector<EPowerUp> _powerUpSelector;
 
     // TODO: make all event handlers async
     
@@ -53,6 +55,8 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         commandService.AddCommand<InvCommand>();
         commandService.AddCommand<UseCommand>();
         this._telegramBot.UpdateCommands();
+
+        this._powerUpSelector = new(PowerUpUtils.WeightedPowerUps);
         
         this.GameTimer.OnTick += this.Tick;
         this.GameTimer.OnFinished += this.TimerFinised;
@@ -288,9 +292,9 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         var claimer = this.GetPlayerById(claimerId);
 
         if (claimer == null) return false;
-        
-        var randomPowerUp = PowerUpUtils.RandomPowerUp();
-        var powerUp = PowerUpUtils.GetPowerUpInstance(randomPowerUp, this, claimer.Id);
+
+        var randomPowerUp = this._powerUpSelector.SelectRandomItem();
+        var powerUp = PowerUpUtils.GetPowerUpInstance(randomPowerUp.Item, this, claimer.Id);
         
         claimer.PlayerGameStateData.Powerups.Add(powerUp);
         
