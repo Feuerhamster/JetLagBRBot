@@ -43,7 +43,7 @@ public class Stealing(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerUp
         owner.PlayerGameStateData.Powerups.Add(selectedPowerUp);
         
         await this.Gamemode.BroadcastMessage(
-            $"\ud83c\udf92 The player {owner.TelegramMention} has stolen a power up from {this.Target.TelegramMention}");
+            $"\ud83c\udf92 The player {owner.TelegramMention} has stolen a power up from {this.Target.TelegramMention}", escape: false);
 
         await this.Gamemode.SendPlayerMessage(this.Target.Id,
             $"\ud83c\udf92 The player {owner.TelegramMention} has stolen the \"{selectedPowerUp.Name}\" power up from you", escape: false);

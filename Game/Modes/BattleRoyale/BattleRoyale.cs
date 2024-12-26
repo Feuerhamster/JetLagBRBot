@@ -216,7 +216,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             return;
         }
 
-        if (victim.PlayerGameStateData.TagStatus == EPlayerTagStatus.Protected)
+        if (victim.PlayerGameStateData.TagStatus != EPlayerTagStatus.Default)
         {
             await this.SendPlayerMessage(taggerId,
                 $"\u26d4 You are currently not allowed to tag {victim.TelegramMention} because they were already recently tagged", escape: false);
