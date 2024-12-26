@@ -97,13 +97,12 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
             if (tag == null)
             {
-                player.PlayerGameStateData.TagStatus = EPlayerTagStatus.Default;
                 continue;
             }
 
             // player is frozen but freeze is over
             if (player.PlayerGameStateData.TagStatus == EPlayerTagStatus.Frozen &&
-                DateTime.Now >= tag.TagTime.Add(this.GameData.TagFreeze))
+                ManagedTimer.VerifyTimeIsOver(tag.TagTime, this.GameData.TagFreeze))
             {
                 player.PlayerGameStateData.TagStatus = EPlayerTagStatus.Protected;
                 await this.SendPlayerMessage(player.Id, $"\u2744\ufe0f You are not frozen anymore and are allowed to move again.");
@@ -113,7 +112,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
             
             // player is protected but personal protection after tag expired
             if (player.PlayerGameStateData.TagStatus == EPlayerTagStatus.Protected &&
-                DateTime.Now >= tag.TagTime.Add(this.GameData.AfterTagProtection))
+                ManagedTimer.VerifyTimeIsOver(tag.TagTime, this.GameData.AfterTagProtection))
             {
                 player.PlayerGameStateData.TagStatus = EPlayerTagStatus.Default;
                 await this.SendPlayerMessage(player.Id, $"\ud83d\udee1\ufe0f You are not protected anymore and you can now be tagged again.");
