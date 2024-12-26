@@ -158,7 +158,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         string locationLink = $"https://www.google.com/maps/place/{lat},{lng}";
         
-        message.AppendLine($"Location: *[{newLandmark.Coordinates[0]}, {newLandmark.Coordinates[1]}]({locationLink})*");
+        message.AppendLine($"Location: *[{TgFormatting.MarkdownEscape(newLandmark.Coordinates[0].ToString())}, {TgFormatting.MarkdownEscape(newLandmark.Coordinates[1].ToString())}]({locationLink})*");
 
         await this.BroadcastMessage(message.ToString(), escape: false);
         
