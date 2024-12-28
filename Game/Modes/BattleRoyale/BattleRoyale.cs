@@ -264,7 +264,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     }
 
     /// <summary>
-    /// Revert a tag
+    /// Revert a tag (including power ups)
     /// </summary>
     /// <param name="TagId">Id of the tag</param>
     /// <returns>successful</returns>
