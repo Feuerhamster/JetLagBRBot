@@ -93,7 +93,10 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
 
         foreach (var player in players)
         {
-            var tag = this.Game.GameStateData.PlayerTags.FirstOrDefault(t => t.VictimId.Equals(player.Id));
+            var tag = this.Game.GameStateData.PlayerTags
+                .Where(t => t.VictimId.Equals(player.Id))
+                .OrderByDescending(t => t.TagTime)
+                .FirstOrDefault();
 
             if (tag == null)
             {
@@ -196,7 +199,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         
         if (victim == null || tagger == null) return;
 
-        if (victim.PlayerGameStateData.HealthPoints == 0)
+        if (victim.PlayerGameStateData.HealthPoints < 1)
         {
             await this.SendPlayerMessage(tagger.Id, "\u26a0\ufe0f Tag failed. Targeted player already dead.");
             return;
@@ -236,17 +239,26 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         }
         
         // execute tag
-        this.OnSuccessfulPlayerTag.Invoke(this, new SuccessfulTagEventArgs(tag));
         this.Game.GameStateData.PlayerTags.Add(tag);
         victim.PlayerGameStateData.HealthPoints -= tag.Damage;
 
         victim.PlayerGameStateData.TagStatus = EPlayerTagStatus.Frozen;
         
+        this.OnSuccessfulPlayerTag.Invoke(this, new SuccessfulTagEventArgs(tag));
+        
         // protection
         var frozenDate = DateTime.Now.Add((TimeSpan)this.GameData.TagFreeze).ToString("HH:mm:ss");
         var protectedDate = DateTime.Now.Add((TimeSpan)this.GameData.AfterTagProtection).ToString("HH:mm:ss");
-        await this.SendPlayerMessage(victim.Id, $"\ud83d\udee1\ufe0f You are now frozen until {frozenDate} and you shall not move and cannot tag others.\n You are also protected until {protectedDate} and can't be tagged by others.");
-        
+
+        if (victim.PlayerGameStateData.HealthPoints > 0)
+        {
+            await this.SendPlayerMessage(victim.Id, $"\ud83d\udee1\ufe0f You are now frozen until {frozenDate} and you shall not move and cannot tag others.\n You are also protected until {protectedDate} and can't be tagged by others.");
+        }
+        else
+        {
+            await this.SendPlayerMessage(victim.Id, "\ud83d\udc80 You are now dead");
+        }
+
         await this.BroadcastMessage($"\ud83d\udea9 Player {tagger.TelegramMention} successfully tagged {victim.TelegramMention}", escape: false);
     }
 
@@ -371,8 +383,9 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
     {
         var victim = this.GetPlayerById(e.PlayerTag.VictimId);
         
-        if (victim.PlayerGameStateData.HealthPoints == 0)
+        if (victim.PlayerGameStateData.HealthPoints < 1)
         {
+            victim.PlayerGameStateData.TagStatus = EPlayerTagStatus.Default;
             this.BroadcastMessage($"\ud83d\udc80 The player {victim.TelegramMention} is now dead", escape: false);
         }
         

@@ -16,7 +16,7 @@ public class NewGameCommand(ITelegramBotService telegramBotService, IGameTemplat
 
     public override ICustomBotCommandConstraint[] Constraints { get; } =
     [
-        new ChatTypeConstraint(ChatType.Group),
+        new ChatTypeConstraint(ChatType.Group, ChatType.Supergroup),
         new OnlyGroupAdminConstraint()
     ];
 

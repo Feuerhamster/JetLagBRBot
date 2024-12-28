@@ -15,13 +15,24 @@ public interface ICustomBotCommandConstraint
 /// Checks if the command is executed from a specific chat type
 /// </summary>
 /// <param name="chatType"></param>
-public class ChatTypeConstraint(ChatType chatType) : ICustomBotCommandConstraint
+public class ChatTypeConstraint : ICustomBotCommandConstraint
 {
+    private ChatType[] ChatTypes { get; set; }
+    
+    public ChatTypeConstraint(ChatType chatType) {
+        ChatTypes = new[] { chatType };
+    }
+
+    public ChatTypeConstraint(params ChatType[] chatTypes)
+    {
+        ChatTypes = chatTypes;
+    }
+    
     public async Task<bool> Execute(IServiceProvider serviceProvider, Message msg)
     {
         var botService = serviceProvider.GetService<ITelegramBotService>();
         
-        if (msg.Chat.Type != chatType)
+        if (!ChatTypes.Contains(msg.Chat.Type))
         {
             await botService.Client.SendMessage(
                 msg.Chat.Id,

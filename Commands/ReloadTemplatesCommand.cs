@@ -14,7 +14,7 @@ public class ReloadTemplatesCommand(IGameTemplateService templateService, ITeleg
 
     public override ICustomBotCommandConstraint[] Constraints { get; } =
     [
-        new ChatTypeConstraint(ChatType.Group),
+        new ChatTypeConstraint(ChatType.Group, ChatType.Supergroup),
         new OnlyGroupAdminConstraint()
     ];
 

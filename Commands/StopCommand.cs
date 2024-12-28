@@ -14,7 +14,7 @@ public class StopCommand(IGameManagerService gameManagerService, ITelegramBotSer
 
     public override ICustomBotCommandConstraint[] Constraints { get; } =
     [
-        new ChatTypeConstraint(ChatType.Group),
+        new ChatTypeConstraint(ChatType.Group, ChatType.Supergroup),
         new OnlyGroupAdminConstraint()
     ];
 
