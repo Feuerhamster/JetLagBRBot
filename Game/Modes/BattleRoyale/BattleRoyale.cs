@@ -54,6 +54,7 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         commandService.AddCommand<ClaimCommand>();
         commandService.AddCommand<InvCommand>();
         commandService.AddCommand<UseCommand>();
+        commandService.AddCommand<UndoTagCommand>();
         this._telegramBot.UpdateCommands();
 
         this._powerUpSelector = new(PowerUpUtils.WeightedPowerUps);
@@ -279,6 +280,11 @@ public class BattleRoyaleGamemode : BaseGame<GameStateData, PlayerOrTeamStateDat
         if (tagger == null || victim == null) return false;
         
         victim.PlayerGameStateData.HealthPoints += tag.Damage;
+
+        foreach (var powerUp in tag.AppliedPowerUps)
+        {
+            await PowerUpUtils.RevertPowerUp(powerUp, tag, this);
+        }
         
         this.Game.GameStateData.PlayerTags.Remove(tag);
 

@@ -49,6 +49,17 @@ public class Vampirism(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePowerU
         
         if (!this.currentTag.Equals(e.PlayerTag.TagId)) return;
 
+        e.PlayerTag.AppliedPowerUps.Add(EPowerUp.Vampirism);
+        
         this.PowerUpSuccessfull();
+    }
+    
+    public static async Task Revert(PlayerTag tag, BattleRoyaleGamemode gamemode)
+    {
+        gamemode.GivePlayerPowerUp(tag.TaggerId, EPowerUp.Vampirism);
+        
+        var tagger = gamemode.GetPlayerById(tag.TaggerId);
+        
+        tagger.PlayerGameStateData.HealthPoints -= 1;
     }
 }

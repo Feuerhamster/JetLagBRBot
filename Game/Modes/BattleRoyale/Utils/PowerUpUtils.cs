@@ -84,5 +84,29 @@ public static class PowerUpUtils
             }
         }
     }
+
+    public static async Task<bool> RevertPowerUp(EPowerUp powerUp, PlayerTag playerTag, BattleRoyaleGamemode gamemode)
+    {
+        switch (powerUp)
+        {
+            case EPowerUp.DoubleDamage:
+            {
+                await DoubleDamage.Revert(playerTag, gamemode);
+                break;
+            }
+            case EPowerUp.Vampirism:
+            {
+                await Vampirism.Revert(playerTag, gamemode);
+                break;
+            }
+            default:
+            {
+                return false;
+            }
+                
+        }
+
+        return true;
+    }
 }
 

@@ -30,6 +30,7 @@ public class DoubleDamage(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
         if (!e.PlayerTag.TaggerId.Equals(this.OwnerId)) return;
         
         e.PlayerTag.Damage *= 2;
+        
         this.currentTag = e.PlayerTag.TagId;
     }
     
@@ -41,6 +42,13 @@ public class DoubleDamage(BattleRoyaleGamemode gamemode, Guid ownerId) : BasePow
         
         if (!this.currentTag.Equals(e.PlayerTag.TagId)) return;
         
+        e.PlayerTag.AppliedPowerUps.Add(EPowerUp.DoubleDamage);
+        
         this.Expire();
+    }
+    
+    public static async Task Revert(PlayerTag tag, BattleRoyaleGamemode gamemode)
+    {
+        gamemode.GivePlayerPowerUp(tag.TaggerId, EPowerUp.DoubleDamage);
     }
 }

@@ -38,6 +38,8 @@ public class PlayerTag
     public Guid TaggerId { get; set; }
     public Guid VictimId { get; set; }
     public int Damage { get; set; }
+    
+    public List<EPowerUp> AppliedPowerUps { get; set; } = new();
 }
 
 public enum EPlayerTagStatus
